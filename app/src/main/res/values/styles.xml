@@ -1,4 +1,5 @@
-<resources>
+<resources
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light">
@@ -8,7 +9,7 @@
         <item name="colorPrimaryDark">@color/primary_dark</item>
         <!-- colorAccent is used as the default value for colorControlActivated
              which is used to tint widgets -->
-        <item name="colorAccent">@color/accent</item>
+        <item name="colorAccent">@color/icons</item>
 
         <item name="actionBarStyle">@style/MyActionBar</item>
 
@@ -20,6 +21,13 @@
 
     <style name="MyTitleTextStyle" parent="@style/TextAppearance.AppCompat.Widget.ActionBar.Title">
         <item name="android:textColor">@color/icons</item>
+    </style>
+
+
+    <style name="circularButton">
+        <item name="android:background">@drawable/circle_button</item>
+        <item name="android:textColor">?attr/colorPrimary</item>
+        <item name="android:textSize">20sp</item>
     </style>
 
 </resources>

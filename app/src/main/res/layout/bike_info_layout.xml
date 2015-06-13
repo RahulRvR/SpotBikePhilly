@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/bikeInfoWindow"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="10dp"
+    android:paddingTop="20dp"
+    android:paddingBottom="20dp"
+    android:background="?attr/colorPrimary">
+
+    <com.devspark.robototextview.widget.RobotoTextView
+        android:id="@+id/txtAddress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginBottom="10dp"
+        android:text="1835 Market Street"
+        android:textColor="@color/icons"
+        app:fontFamily="roboto_slab"
+        app:textWeight="bold" />
+
+
+    <com.devspark.robototextview.widget.RobotoTextView
+        android:id="@+id/txtFreeDocks"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@id/txtAddress"
+        android:background="@drawable/circle_button"
+        android:gravity="center"
+        android:padding="5dp"
+        android:text="Free Docks : 23"
+        android:textColor="?colorPrimary"
+        app:fontFamily="roboto_slab"
+        app:textWeight="light" />
+
+    <com.devspark.robototextview.widget.RobotoTextView
+        android:id="@+id/txtBikeAvl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/txtAddress"
+        android:layout_marginLeft="5dp"
+        android:layout_toRightOf="@+id/txtFreeDocks"
+        android:background="@drawable/circle_button"
+        android:gravity="center"
+        android:padding="5dp"
+        android:text="Bikes : 0"
+        android:textColor="?colorPrimary"
+        app:fontFamily="roboto_slab"
+        app:textWeight="light" />
+
+
+</RelativeLayout>

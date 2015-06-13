@@ -1,29 +1,64 @@
 package com.rahulrvr.spotbikephilly;
 
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
+import android.widget.SeekBar;
+import android.widget.Switch;
 
 import com.crashlytics.android.Crashlytics;
+import com.devspark.robototextview.widget.RobotoTextView;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import butterknife.ButterKnife;
+import butterknife.InjectView;
+import butterknife.OnClick;
 import io.fabric.sdk.android.Fabric;
 
 public class MapsActivity extends AppCompatActivity {
 
+    @InjectView(R.id.txtAddress)
+    RobotoTextView txtAddress;
+    @InjectView(R.id.txtFreeDocks)
+    RobotoTextView txtFreeDocks;
+    @InjectView(R.id.txtBikeAvl)
+    RobotoTextView txtBikeAvl;
+    @InjectView(R.id.bikeInfoWindow)
+    RelativeLayout bikeInfoWindow;
+    @InjectView(R.id.searchDistance)
+    SeekBar searchDistance;
+    @InjectView(R.id.txtTotalDocks)
+    RobotoTextView txtTotalDocks;
+    @InjectView(R.id.exploreAll)
+    Switch exploreAll;
+    @InjectView(R.id.searchBikeWindow)
+    RelativeLayout searchBikeWindow;
+    @InjectView(R.id.mainLayout)
+    FrameLayout mainLayout;
+
+
+    @InjectView(R.id.fab)
+    FloatingActionButton fab;
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if(!BuildConfig.DEBUG) {
+        if (!BuildConfig.DEBUG) {
             Fabric.with(this, new Crashlytics());
         }
         setContentView(R.layout.activity_maps);
+        ButterKnife.inject(this);
         setUpMapIfNeeded();
     }
+
 
     @Override
     protected void onResume() {
@@ -37,7 +72,7 @@ public class MapsActivity extends AppCompatActivity {
      * call {@link #setUpMap()} once when {@link #mMap} is not null.
      * <p/>
      * If it isn't installed {@link SupportMapFragment} (and
-     * {@link com.google.android.gms.maps.MapView MapView}) will show a prompt for the user to
+     * {@link MapView MapView}) will show a prompt for the user to
      * install/update the Google Play services APK on their device.
      * <p/>
      * A user can return to this FragmentActivity after following the prompt and correctly
@@ -67,5 +102,24 @@ public class MapsActivity extends AppCompatActivity {
      */
     private void setUpMap() {
         mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
+    }
+
+    @OnClick(R.id.txtTotalDocks)
+    public void onitem(View view) {
+        bikeInfoWindow.setVisibility(View.VISIBLE);
+        searchBikeWindow.animate().translationYBy(searchBikeWindow.getHeight()).start();
+        fab.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(bikeInfoWindow.isShown()) {
+            bikeInfoWindow.setVisibility(View.GONE);
+            searchBikeWindow.animate().translationYBy(-searchBikeWindow.getHeight()).start();
+            fab.setVisibility(View.GONE);
+
+        } else {
+            super.onBackPressed();
+        }
     }
 }
