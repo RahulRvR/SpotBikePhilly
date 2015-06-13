@@ -3,10 +3,12 @@ package com.rahulrvr.spotbikephilly;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import io.fabric.sdk.android.Fabric;
 
 public class MapsActivity extends FragmentActivity {
 
@@ -15,6 +17,7 @@ public class MapsActivity extends FragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Fabric.with(this, new Crashlytics());
         setContentView(R.layout.activity_maps);
         setUpMapIfNeeded();
     }
