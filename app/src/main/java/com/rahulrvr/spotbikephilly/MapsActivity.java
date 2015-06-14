@@ -39,14 +39,14 @@ import butterknife.InjectView;
 import butterknife.OnClick;
 import io.fabric.sdk.android.Fabric;
 import rx.Observable;
+import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
 import rx.functions.Func1;
 
 public class MapsActivity extends AppCompatActivity implements GetLocationView {
 
     private static final int DEFAULT_ZOOM = 15;
-    private static final int MAX_DISTANCE_SEARCH = 3; //miles
+    private static final float DEFAULT_MILE = 0.2f; //miles
 
     @InjectView(R.id.txtAddress)
     RobotoTextView txtAddress;
@@ -92,8 +92,11 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView {
         searchDistance.setRangePinsByIndices(0, 0);
         searchDistance.setEnabled(false);
         searchDistance.setOnRangeBarChangeListener(new RangeBar.OnRangeBarChangeListener() {
+
+
             @Override
             public void onRangeChangeListener(RangeBar rangeBar, int i, int i1, String s, final String s1) {
+
                 rangeBar.setOnTouchListener(new View.OnTouchListener() {
                     @Override
                     public boolean onTouch(View v, MotionEvent event) {
@@ -202,7 +205,8 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView {
         mLocationObservable = Observable.from(locations);
         Toast.makeText(this, Integer.toString(locations.size()), Toast.LENGTH_LONG).show();
         searchDistance.setEnabled(true);
-        searchDistance.setRangePinsByValue(0,0.2f);
+        searchDistance.setSeekPinByValue(DEFAULT_MILE);
+        setLocationsOnMap(DEFAULT_MILE);
     }
 
     @Override
@@ -236,9 +240,20 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView {
                 double distInMiles = distance / 1609.34;
                 return distInMiles <= distRange || mShowAll;
             }
-        }).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Feature>() {
+        }).observeOn(AndroidSchedulers.mainThread()).subscribe(new Observer<Feature>() {
             @Override
-            public void call(Feature feature) {
+            public void onCompleted() {
+                updateSearchText(distRange);
+                setMapZoom((int) distRange);
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onNext(Feature feature) {
                 Geometry geometry = feature.getGeometry();
                 Double longitude = geometry.getCoordinates().get(0);
                 Double latitude = geometry.getCoordinates().get(1);
@@ -248,7 +263,6 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView {
                         .anchor(0.0f, 1.0f)
                         .position(point));
                 mMarkers.put(marker, feature);
-                setMapZoom((int) distRange);
             }
         });
     }
@@ -259,6 +273,11 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView {
             mMarkers.clear();
         }
 
+    }
+
+    private void updateSearchText(float dist) {
+        String str = String.format(getString(R.string.search_text), mMarkers.size(), dist);
+        txtTotalDocks.setText(str);
     }
 
     private void setMapZoom(int zoomBy) {
