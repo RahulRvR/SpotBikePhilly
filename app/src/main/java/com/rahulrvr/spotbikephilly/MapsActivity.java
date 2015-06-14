@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
@@ -88,15 +89,27 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView {
         ButterKnife.inject(this);
         setUpMapIfNeeded();
         mPresenter = new GetLocationPresenterImpl(this);
-        searchDistance.setRangePinsByIndices(0,0);
+        searchDistance.setRangePinsByIndices(0, 0);
+        searchDistance.setEnabled(false);
         searchDistance.setOnRangeBarChangeListener(new RangeBar.OnRangeBarChangeListener() {
             @Override
-            public void onRangeChangeListener(RangeBar rangeBar, int i, int i1, String s, String s1) {
-                setLocationsOnMap(Float.parseFloat(s1));
+            public void onRangeChangeListener(RangeBar rangeBar, int i, int i1, String s, final String s1) {
+                rangeBar.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        if(event.getAction() == MotionEvent.ACTION_UP) {
+                            setLocationsOnMap(Float.parseFloat(s1));
+                        }
+                        return false;
+                    }
+                });
+
             }
 
 
         });
+
+
     }
 
 
@@ -188,7 +201,8 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView {
     public void onLocationsReceived(List<Feature> locations) {
         mLocationObservable = Observable.from(locations);
         Toast.makeText(this, Integer.toString(locations.size()), Toast.LENGTH_LONG).show();
-        //searchDistance.setRangePinsByValue(getProgressFromMiles(0.3f));
+        searchDistance.setEnabled(true);
+        searchDistance.setRangePinsByValue(0,0.2f);
     }
 
     @Override
@@ -237,16 +251,6 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView {
                 setMapZoom((int) distRange);
             }
         });
-    }
-
-    private float getMilesFromProgress(int progress) {
-        float miles = progress * MAX_DISTANCE_SEARCH;
-        miles = miles / 100;
-        return miles;
-    }
-
-    private int getProgressFromMiles(float miles) {
-        return (int) ((miles * 100) / MAX_DISTANCE_SEARCH);
     }
 
     public void clearMarkers() {
