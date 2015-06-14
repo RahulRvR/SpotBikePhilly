@@ -42,7 +42,10 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
 
-public class MapsActivity extends AppCompatActivity implements GetLocationView{
+public class MapsActivity extends AppCompatActivity implements GetLocationView {
+
+    private static final int DEFAULT_ZOOM = 15;
+    private static final int MAX_DISTANCE_SEARCH = 3; //miles
 
     @InjectView(R.id.txtAddress)
     RobotoTextView txtAddress;
@@ -64,11 +67,12 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView{
     FrameLayout mainLayout;
 
     private Observable<Feature> mLocationObservable;
-    private static final int DEFAULT_ZOOM = 15;
+
     GetLocationPresenter mPresenter;
     Location mCurrentLocation;
     boolean mShowAll = false;
-    HashMap<Marker, Object> mMarkers = new HashMap <Marker, Object>();
+    HashMap<Marker, Object> mMarkers = new HashMap<Marker, Object>();
+
 
     @InjectView(R.id.fab)
     FloatingActionButton fab;
@@ -84,6 +88,23 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView{
         ButterKnife.inject(this);
         setUpMapIfNeeded();
         mPresenter = new GetLocationPresenterImpl(this);
+
+        searchDistance.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                setLocationsOnMap(getMilesFromProgress(seekBar.getProgress()));
+            }
+        });
     }
 
 
@@ -133,10 +154,7 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView{
         LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         mCurrentLocation = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
-        final LatLng mCurrentPos = new LatLng(mCurrentLocation.getLatitude(),
-                mCurrentLocation.getLongitude());
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mCurrentPos, DEFAULT_ZOOM));
-
+        setMapZoom(0);
     }
 
 
@@ -164,7 +182,7 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView{
 
     @Override
     public void onBackPressed() {
-        if(bikeInfoWindow.isShown()) {
+        if (bikeInfoWindow.isShown()) {
             bikeInfoWindow.setVisibility(View.GONE);
             searchBikeWindow.animate().translationYBy(-searchBikeWindow.getHeight()).start();
             fab.setVisibility(View.GONE);
@@ -177,8 +195,8 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView{
     @Override
     public void onLocationsReceived(List<Feature> locations) {
         mLocationObservable = Observable.from(locations);
-        Toast.makeText(this, Integer.toString(locations.size()),Toast.LENGTH_LONG).show();
-        setLocationsOnMap(0.3f);
+        Toast.makeText(this, Integer.toString(locations.size()), Toast.LENGTH_LONG).show();
+        searchDistance.setProgress(getProgressFromMiles(0.3f));
     }
 
     @Override
@@ -197,7 +215,7 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView{
     }
 
     private void setLocationsOnMap(final float distRange) {
-
+        clearMarkers();
         mLocationObservable.filter(new Func1<Feature, Boolean>() {
             @Override
             public Boolean call(Feature feature) {
@@ -223,8 +241,34 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView{
                 Marker marker = mMap.addMarker(new MarkerOptions()
                         .anchor(0.0f, 1.0f)
                         .position(point));
-                mMarkers.put(marker,feature);
+                mMarkers.put(marker, feature);
+                setMapZoom((int) distRange);
+
             }
         });
+    }
+
+    private float getMilesFromProgress(int progress) {
+        float miles = progress * MAX_DISTANCE_SEARCH;
+        miles = miles / 100;
+        return miles;
+    }
+
+    private int getProgressFromMiles(float miles) {
+        return (int) ((miles * 100) / MAX_DISTANCE_SEARCH);
+    }
+
+    public void clearMarkers() {
+        if (mMap != null) {
+            mMap.clear();
+            mMarkers.clear();
+        }
+
+    }
+
+    private void setMapZoom(int zoomBy) {
+        final LatLng mCurrentPos = new LatLng(mCurrentLocation.getLatitude(),
+                mCurrentLocation.getLongitude());
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mCurrentPos, DEFAULT_ZOOM - zoomBy));
     }
 }
