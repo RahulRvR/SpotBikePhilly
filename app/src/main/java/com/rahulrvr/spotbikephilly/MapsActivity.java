@@ -182,15 +182,14 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-        bikeInfoWindow.setVisibility(View.VISIBLE);
         Feature feature = mMarkers.get(marker);
-        searchBikeWindow.animate().translationYBy(searchBikeWindow.getHeight()).start();
         fab.setVisibility(View.VISIBLE);
         txtFreeDocks.setText(String.format(getString(R.string.free_docks),feature.getProperties().getDocksAvailable()));
         txtBikeAvl.setText(String.format(getString(R.string.bikes),feature.getProperties().getBikesAvailable()));
         txtAddress.setText(feature.getProperties().getAddressStreet());
         mSelectedCoOrdinates = new LatLng(feature.getGeometry().getCoordinates().get(1),
                 feature.getGeometry().getCoordinates().get(0));
+        showInfoScreen(false);
         return false;
     }
 
@@ -200,16 +199,23 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
         //TODO show all locations
     }
 
-    private void showInfoScreen() {
-        bikeInfoWindow.setVisibility(View.GONE);
-        searchBikeWindow.animate().translationYBy(-searchBikeWindow.getHeight()).start();
-        fab.setVisibility(View.GONE);
+    private void showInfoScreen(boolean flag) {
+        if(flag) {
+            bikeInfoWindow.setVisibility(View.GONE);
+            searchBikeWindow.animate().translationYBy(-searchBikeWindow.getHeight()).start();
+            fab.setVisibility(View.GONE);
+        } else {
+            bikeInfoWindow.setVisibility(View.VISIBLE);
+            searchBikeWindow.animate().translationYBy(searchBikeWindow.getHeight()).start();
+        }
     }
+
+
 
     @Override
     public void onBackPressed() {
         if (bikeInfoWindow.isShown()) {
-            showInfoScreen();
+            showInfoScreen(true);
         } else {
             super.onBackPressed();
         }
