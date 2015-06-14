@@ -3,4 +3,8 @@
     <string name="title_activity_maps">Map</string>
 
     <string name="search_text">%1$d Dock(s) within %2$.2f mi.</string>
+
+    <string name="free_docks">Free Docks : %1$d</string>
+
+    <string name="bikes">Bikes : %1$d</string>
 </resources>

@@ -43,7 +43,7 @@ import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
 
-public class MapsActivity extends AppCompatActivity implements GetLocationView {
+public class MapsActivity extends AppCompatActivity implements GetLocationView, GoogleMap.OnMarkerClickListener {
 
     private static final int DEFAULT_ZOOM = 15;
     private static final float DEFAULT_MILE = 0.2f; //miles
@@ -71,8 +71,12 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView {
 
     GetLocationPresenter mPresenter;
     Location mCurrentLocation;
+
+    boolean updateUI = true;
+
+    LatLng mSelectedCoOrdinates;
     boolean mShowAll = false;
-    HashMap<Marker, Object> mMarkers = new HashMap<Marker, Object>();
+    HashMap<Marker, Feature> mMarkers = new HashMap<Marker, Feature>();
 
 
     @InjectView(R.id.fab)
@@ -159,6 +163,7 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView {
      */
     private void setUpMap() {
         mMap.setMyLocationEnabled(true);
+        mMap.setOnMarkerClickListener(this);
         LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         mCurrentLocation = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
@@ -168,33 +173,43 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView {
 
     @OnClick(R.id.fab)
     public void navigate(View view) {
-        //TODO change coordinates
+       String str = "daddr=" + mSelectedCoOrdinates.latitude + "," + mSelectedCoOrdinates.longitude;
         Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
-                Uri.parse("http://maps.google.com/maps?saddr=20.344,34.34&daddr=20.5666,45.345"));
+                Uri.parse("http://maps.google.com/maps?" + str));
         startActivity(intent);
 
     }
 
-    @OnClick(R.id.txtTotalDocks)
-    public void onitem(View view) {
-        //TODO remove this and add it to on marker click
+    @Override
+    public boolean onMarkerClick(Marker marker) {
         bikeInfoWindow.setVisibility(View.VISIBLE);
+        Feature feature = mMarkers.get(marker);
         searchBikeWindow.animate().translationYBy(searchBikeWindow.getHeight()).start();
         fab.setVisibility(View.VISIBLE);
+        txtFreeDocks.setText(String.format(getString(R.string.free_docks),feature.getProperties().getDocksAvailable()));
+        txtBikeAvl.setText(String.format(getString(R.string.bikes),feature.getProperties().getBikesAvailable()));
+        txtAddress.setText(feature.getProperties().getAddressStreet());
+        mSelectedCoOrdinates = new LatLng(feature.getGeometry().getCoordinates().get(1),
+                feature.getGeometry().getCoordinates().get(0));
+        return false;
     }
+
 
     @OnClick(R.id.exploreAll)
     public void showAll(View view) {
         //TODO show all locations
     }
 
+    private void showInfoScreen() {
+        bikeInfoWindow.setVisibility(View.GONE);
+        searchBikeWindow.animate().translationYBy(-searchBikeWindow.getHeight()).start();
+        fab.setVisibility(View.GONE);
+    }
+
     @Override
     public void onBackPressed() {
         if (bikeInfoWindow.isShown()) {
-            bikeInfoWindow.setVisibility(View.GONE);
-            searchBikeWindow.animate().translationYBy(-searchBikeWindow.getHeight()).start();
-            fab.setVisibility(View.GONE);
-
+            showInfoScreen();
         } else {
             super.onBackPressed();
         }
@@ -204,9 +219,12 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView {
     public void onLocationsReceived(List<Feature> locations) {
         mLocationObservable = Observable.from(locations);
         Toast.makeText(this, Integer.toString(locations.size()), Toast.LENGTH_LONG).show();
-        searchDistance.setEnabled(true);
-        searchDistance.setSeekPinByValue(DEFAULT_MILE);
-        setLocationsOnMap(DEFAULT_MILE);
+        if(updateUI) {
+            searchDistance.setEnabled(true);
+            searchDistance.setSeekPinByValue(DEFAULT_MILE);
+            setLocationsOnMap(DEFAULT_MILE);
+            updateUI = false;
+        }
     }
 
     @Override
