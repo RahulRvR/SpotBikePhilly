@@ -22,6 +22,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -71,7 +72,7 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
 
     GetLocationPresenter mPresenter;
     Location mCurrentLocation;
-
+    Marker mPreviousMarker = null;
     boolean updateUI = true;
 
     LatLng mSelectedCoOrdinates;
@@ -166,7 +167,6 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
         mMap.setOnMarkerClickListener(this);
         LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         mCurrentLocation = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
         setMapZoom(0);
     }
 
@@ -182,6 +182,14 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
 
     @Override
     public boolean onMarkerClick(Marker marker) {
+
+        if(mPreviousMarker != null) {
+            mPreviousMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bike_map));
+        }
+
+
+        marker.setIcon(BitmapDescriptorFactory.defaultMarker(
+                BitmapDescriptorFactory.HUE_RED));
         Feature feature = mMarkers.get(marker);
         fab.setVisibility(View.VISIBLE);
         txtFreeDocks.setText(String.format(getString(R.string.free_docks),feature.getProperties().getDocksAvailable()));
@@ -286,6 +294,7 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
                 Marker marker = mMap.addMarker(new MarkerOptions()
                         .anchor(0.0f, 1.0f)
                         .position(point));
+                marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bike_map));
                 mMarkers.put(marker, feature);
             }
         });
