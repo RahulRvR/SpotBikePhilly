@@ -11,10 +11,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
-import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.Toast;
 
+import com.appyvet.rangebar.RangeBar;
 import com.crashlytics.android.Crashlytics;
 import com.devspark.robototextview.widget.RobotoTextView;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -56,7 +56,7 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView {
     @InjectView(R.id.bikeInfoWindow)
     RelativeLayout bikeInfoWindow;
     @InjectView(R.id.searchDistance)
-    SeekBar searchDistance;
+    RangeBar searchDistance;
     @InjectView(R.id.txtTotalDocks)
     RobotoTextView txtTotalDocks;
     @InjectView(R.id.exploreAll)
@@ -88,22 +88,14 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView {
         ButterKnife.inject(this);
         setUpMapIfNeeded();
         mPresenter = new GetLocationPresenterImpl(this);
-
-        searchDistance.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+        searchDistance.setRangePinsByIndices(0,0);
+        searchDistance.setOnRangeBarChangeListener(new RangeBar.OnRangeBarChangeListener() {
             @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-
+            public void onRangeChangeListener(RangeBar rangeBar, int i, int i1, String s, String s1) {
+                setLocationsOnMap(Float.parseFloat(s1));
             }
 
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
 
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-                setLocationsOnMap(getMilesFromProgress(seekBar.getProgress()));
-            }
         });
     }
 
@@ -196,7 +188,7 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView {
     public void onLocationsReceived(List<Feature> locations) {
         mLocationObservable = Observable.from(locations);
         Toast.makeText(this, Integer.toString(locations.size()), Toast.LENGTH_LONG).show();
-        searchDistance.setProgress(getProgressFromMiles(0.3f));
+        //searchDistance.setRangePinsByValue(getProgressFromMiles(0.3f));
     }
 
     @Override
@@ -243,7 +235,6 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView {
                         .position(point));
                 mMarkers.put(marker, feature);
                 setMapZoom((int) distRange);
-
             }
         });
     }
