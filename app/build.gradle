@@ -27,9 +27,24 @@ android {
         versionName "1.0"
     }
     buildTypes {
+        def STRING = "String"
+        def BASE_END_POINT = "BASE_SERVER_ENDPOINT"
+
+        def DEV_END_POINT= "\"https://api.phila.gov\""
+        def PROD_END_POINT = "\"https://api.phila.gov\""
+
+
+
+        debug {
+            applicationIdSuffix ".debug"
+            debuggable true
+            buildConfigField STRING,BASE_END_POINT,DEV_END_POINT
+        }
+
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            buildConfigField STRING,BASE_END_POINT,PROD_END_POINT
         }
     }
 

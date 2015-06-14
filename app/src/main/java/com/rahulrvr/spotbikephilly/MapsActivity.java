@@ -1,5 +1,10 @@
 package com.rahulrvr.spotbikephilly;
 
+import android.content.Context;
+import android.content.Intent;
+import android.location.Location;
+import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -8,21 +13,36 @@ import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.Switch;
+import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
 import com.devspark.robototextview.widget.RobotoTextView;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.rahulrvr.spotbikephilly.impl.GetLocationPresenterImpl;
+import com.rahulrvr.spotbikephilly.interfaces.GetLocationPresenter;
+import com.rahulrvr.spotbikephilly.interfaces.GetLocationView;
+import com.rahulrvr.spotbikephilly.pojo.Feature;
+import com.rahulrvr.spotbikephilly.pojo.Geometry;
+
+import java.util.HashMap;
+import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
 import io.fabric.sdk.android.Fabric;
+import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.functions.Func1;
 
-public class MapsActivity extends AppCompatActivity {
+public class MapsActivity extends AppCompatActivity implements GetLocationView{
 
     @InjectView(R.id.txtAddress)
     RobotoTextView txtAddress;
@@ -43,6 +63,12 @@ public class MapsActivity extends AppCompatActivity {
     @InjectView(R.id.mainLayout)
     FrameLayout mainLayout;
 
+    private Observable<Feature> mLocationObservable;
+    private static final int DEFAULT_ZOOM = 15;
+    GetLocationPresenter mPresenter;
+    Location mCurrentLocation;
+    boolean mShowAll = false;
+    HashMap<Marker, Object> mMarkers = new HashMap <Marker, Object>();
 
     @InjectView(R.id.fab)
     FloatingActionButton fab;
@@ -57,6 +83,7 @@ public class MapsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_maps);
         ButterKnife.inject(this);
         setUpMapIfNeeded();
+        mPresenter = new GetLocationPresenterImpl(this);
     }
 
 
@@ -64,6 +91,7 @@ public class MapsActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         setUpMapIfNeeded();
+        mPresenter.getLocations(this);
     }
 
     /**
@@ -101,14 +129,37 @@ public class MapsActivity extends AppCompatActivity {
      * This should only be called once and when we are sure that {@link #mMap} is not null.
      */
     private void setUpMap() {
+        mMap.setMyLocationEnabled(true);
+        LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        mCurrentLocation = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
+        final LatLng mCurrentPos = new LatLng(mCurrentLocation.getLatitude(),
+                mCurrentLocation.getLongitude());
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mCurrentPos, DEFAULT_ZOOM));
+
+    }
+
+
+    @OnClick(R.id.fab)
+    public void navigate(View view) {
+        //TODO change coordinates
+        Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
+                Uri.parse("http://maps.google.com/maps?saddr=20.344,34.34&daddr=20.5666,45.345"));
+        startActivity(intent);
+
     }
 
     @OnClick(R.id.txtTotalDocks)
     public void onitem(View view) {
+        //TODO remove this and add it to on marker click
         bikeInfoWindow.setVisibility(View.VISIBLE);
         searchBikeWindow.animate().translationYBy(searchBikeWindow.getHeight()).start();
         fab.setVisibility(View.VISIBLE);
+    }
+
+    @OnClick(R.id.exploreAll)
+    public void showAll(View view) {
+        //TODO show all locations
     }
 
     @Override
@@ -121,5 +172,59 @@ public class MapsActivity extends AppCompatActivity {
         } else {
             super.onBackPressed();
         }
+    }
+
+    @Override
+    public void onLocationsReceived(List<Feature> locations) {
+        mLocationObservable = Observable.from(locations);
+        Toast.makeText(this, Integer.toString(locations.size()),Toast.LENGTH_LONG).show();
+        setLocationsOnMap(0.3f);
+    }
+
+    @Override
+    public void showProgressBar() {
+
+    }
+
+    @Override
+    public void hideProgressBar() {
+
+    }
+
+    @Override
+    public void onError() {
+
+    }
+
+    private void setLocationsOnMap(final float distRange) {
+
+        mLocationObservable.filter(new Func1<Feature, Boolean>() {
+            @Override
+            public Boolean call(Feature feature) {
+                Geometry geometry = feature.getGeometry();
+                Double longitude = geometry.getCoordinates().get(0);
+                Double latitude = geometry.getCoordinates().get(1);
+
+                Location location = new Location("loc");
+                location.setLongitude(longitude);
+                location.setLatitude(latitude);
+                float distance = mCurrentLocation.distanceTo(location);
+                double distInMiles = distance / 1609.34;
+                return distInMiles <= distRange || mShowAll;
+            }
+        }).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Feature>() {
+            @Override
+            public void call(Feature feature) {
+                Geometry geometry = feature.getGeometry();
+                Double longitude = geometry.getCoordinates().get(0);
+                Double latitude = geometry.getCoordinates().get(1);
+
+                final LatLng point = new LatLng(latitude, longitude);
+                Marker marker = mMap.addMarker(new MarkerOptions()
+                        .anchor(0.0f, 1.0f)
+                        .position(point));
+                mMarkers.put(marker,feature);
+            }
+        });
     }
 }
