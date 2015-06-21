@@ -12,6 +12,7 @@ import android.support.v7.widget.SwitchCompat;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -68,6 +69,8 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
     RelativeLayout searchBikeWindow;
     @InjectView(R.id.mainLayout)
     FrameLayout mainLayout;
+    @InjectView(R.id.progressBar)
+    ProgressBar progressBar;
 
     private Observable<Feature> mLocationObservable;
 
@@ -106,7 +109,7 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
                 rangeBar.setOnTouchListener(new View.OnTouchListener() {
                     @Override
                     public boolean onTouch(View v, MotionEvent event) {
-                        if(event.getAction() == MotionEvent.ACTION_UP) {
+                        if (event.getAction() == MotionEvent.ACTION_UP) {
                             setLocationsOnMap(Float.parseFloat(s1));
                         }
                         return false;
@@ -174,8 +177,8 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
 
     @OnClick(R.id.fab)
     public void navigate(View view) {
-       String str = "daddr=" + mSelectedCoOrdinates.latitude + "," + mSelectedCoOrdinates.longitude;
-        Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
+        String str = "daddr=" + mSelectedCoOrdinates.latitude + "," + mSelectedCoOrdinates.longitude;
+        Intent intent = new Intent(Intent.ACTION_VIEW,
                 Uri.parse("http://maps.google.com/maps?" + str));
         startActivity(intent);
 
@@ -184,7 +187,7 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
     @Override
     public boolean onMarkerClick(Marker marker) {
 
-        if(mPreviousMarker != null) {
+        if (mPreviousMarker != null) {
             mPreviousMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bike_map));
         }
 
@@ -193,8 +196,8 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
                 BitmapDescriptorFactory.HUE_RED));
         Feature feature = mMarkers.get(marker);
         fab.setVisibility(View.VISIBLE);
-        txtFreeDocks.setText(String.format(getString(R.string.free_docks),feature.getProperties().getDocksAvailable()));
-        txtBikeAvl.setText(String.format(getString(R.string.bikes),feature.getProperties().getBikesAvailable()));
+        txtFreeDocks.setText(String.format(getString(R.string.free_docks), feature.getProperties().getDocksAvailable()));
+        txtBikeAvl.setText(String.format(getString(R.string.bikes), feature.getProperties().getBikesAvailable()));
         txtAddress.setText(feature.getProperties().getAddressStreet());
         mSelectedCoOrdinates = new LatLng(feature.getGeometry().getCoordinates().get(1),
                 feature.getGeometry().getCoordinates().get(0));
@@ -209,7 +212,7 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
     }
 
     private void showInfoScreen(boolean flag) {
-        if(flag) {
+        if (flag) {
             bikeInfoWindow.setVisibility(View.GONE);
             searchBikeWindow.animate().translationYBy(-searchBikeWindow.getHeight()).start();
             fab.setVisibility(View.GONE);
@@ -218,7 +221,6 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
             searchBikeWindow.animate().translationYBy(searchBikeWindow.getHeight()).start();
         }
     }
-
 
 
     @Override
@@ -234,7 +236,9 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
     public void onLocationsReceived(List<Feature> locations) {
         mLocationObservable = Observable.from(locations);
         Toast.makeText(this, Integer.toString(locations.size()), Toast.LENGTH_LONG).show();
-        if(updateUI) {
+
+
+        if (updateUI) {
             searchDistance.setEnabled(true);
             searchDistance.setSeekPinByValue(DEFAULT_MILE);
             setLocationsOnMap(DEFAULT_MILE);
@@ -244,11 +248,19 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
 
     @Override
     public void showProgressBar() {
-
+            progressBar.setVisibility(View.VISIBLE);
+            txtTotalDocks.setVisibility(View.GONE);
+            exploreAll.setVisibility(View.GONE);
+            searchDistance.setVisibility(View.GONE);
     }
 
     @Override
     public void hideProgressBar() {
+
+        progressBar.setVisibility(View.GONE);
+        txtTotalDocks.setVisibility(View.VISIBLE);
+        exploreAll.setVisibility(View.VISIBLE);
+        searchDistance.setVisibility(View.VISIBLE);
 
     }
 
@@ -315,17 +327,17 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
     }
 
     private void setMapZoom(int zoomBy) {
-        if(mCurrentLocation !=null) {
+        if (mCurrentLocation != null) {
             final LatLng mCurrentPos = new LatLng(mCurrentLocation.getLatitude(),
                     mCurrentLocation.getLongitude());
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mCurrentPos, DEFAULT_ZOOM - zoomBy));
-        }else {
-            showErrorMessage(R.string.error_title,R.string.location_not_found);
+        } else {
+            showErrorMessage(R.string.error_title, R.string.location_not_found);
         }
     }
 
 
-    private void showErrorMessage(int title,int message) {
+    private void showErrorMessage(int title, int message) {
         new MaterialDialog.Builder(this)
                 .positiveColorRes(R.color.primary)
                 .title(title)
@@ -334,4 +346,5 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
                 .show();
 
     }
+
 }

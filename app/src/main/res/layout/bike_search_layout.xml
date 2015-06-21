@@ -24,6 +24,7 @@
         android:layout_width="match_parent"
         custom:rangeBar="false"
         android:layout_height="72dp"
+        android:visibility="gone"
         android:layout_alignParentTop="true" />
 
     <com.devspark.robototextview.widget.RobotoTextView
@@ -36,6 +37,7 @@
         tools:text="10 Docks within in 0.02 mi"
         android:textColor="?colorPrimary"
         app:fontFamily="roboto_slab"
+        android:visibility="gone"
         app:textWeight="light" />
 
 
@@ -45,6 +47,16 @@
         android:layout_alignParentRight="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         android:textColor="@color/icons" />
+
+
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_centerInParent="true"
+        android:layout_width="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_height="wrap_content" />
 
 </RelativeLayout>
