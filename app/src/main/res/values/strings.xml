@@ -7,4 +7,11 @@
     <string name="free_docks">Free Docks : %1$d</string>
 
     <string name="bikes">Bikes : %1$d</string>
+
+    <string name="error_title">Error</string>
+
+    <string name="location_not_found">Could not detect current location, Please try again later.</string>
+
+    <string name="action_ok">OK</string>
+
 </resources>

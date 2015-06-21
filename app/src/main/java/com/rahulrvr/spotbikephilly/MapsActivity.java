@@ -8,13 +8,14 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SwitchCompat;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
-import android.widget.Switch;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.appyvet.rangebar.RangeBar;
 import com.crashlytics.android.Crashlytics;
 import com.devspark.robototextview.widget.RobotoTextView;
@@ -62,7 +63,7 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
     @InjectView(R.id.txtTotalDocks)
     RobotoTextView txtTotalDocks;
     @InjectView(R.id.exploreAll)
-    Switch exploreAll;
+    SwitchCompat exploreAll;
     @InjectView(R.id.searchBikeWindow)
     RelativeLayout searchBikeWindow;
     @InjectView(R.id.mainLayout)
@@ -314,8 +315,23 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
     }
 
     private void setMapZoom(int zoomBy) {
-        final LatLng mCurrentPos = new LatLng(mCurrentLocation.getLatitude(),
-                mCurrentLocation.getLongitude());
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mCurrentPos, DEFAULT_ZOOM - zoomBy));
+        if(mCurrentLocation !=null) {
+            final LatLng mCurrentPos = new LatLng(mCurrentLocation.getLatitude(),
+                    mCurrentLocation.getLongitude());
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mCurrentPos, DEFAULT_ZOOM - zoomBy));
+        }else {
+            showErrorMessage(R.string.error_title,R.string.location_not_found);
+        }
+    }
+
+
+    private void showErrorMessage(int title,int message) {
+        new MaterialDialog.Builder(this)
+                .positiveColorRes(R.color.primary)
+                .title(title)
+                .content(message)
+                .positiveText(R.string.action_ok)
+                .show();
+
     }
 }

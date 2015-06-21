@@ -39,7 +39,7 @@
         app:textWeight="light" />
 
 
-    <Switch
+    <android.support.v7.widget.SwitchCompat
         android:id="@+id/exploreAll"
         android:layout_below="@+id/searchDistance"
         android:layout_alignParentRight="true"
