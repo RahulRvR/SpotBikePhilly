@@ -9,6 +9,22 @@
     android:paddingBottom="20dp"
     android:background="?attr/colorPrimary">
 
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:clickable="true"
+        android:src="@drawable/ic_maps_directions_walk"
+        app:elevation="6dp"
+        app:layout_anchor="@+id/toolbar"
+        app:layout_anchorGravity="right"
+        app:pressedTranslationZ="12dp" />
+
+
+
     <com.devspark.robototextview.widget.RobotoTextView
         android:id="@+id/txtAddress"
         android:layout_width="wrap_content"

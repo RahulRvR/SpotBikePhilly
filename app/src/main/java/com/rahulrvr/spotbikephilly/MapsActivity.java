@@ -130,6 +130,7 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
         super.onResume();
         setUpMapIfNeeded();
         mPresenter.getLocations(this);
+        showInfoScreen(true);
     }
 
     /**
@@ -191,7 +192,7 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
             mPreviousMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bike_map));
         }
 
-
+        mPreviousMarker = marker;
         marker.setIcon(BitmapDescriptorFactory.defaultMarker(
                 BitmapDescriptorFactory.HUE_RED));
         Feature feature = mMarkers.get(marker);
@@ -214,11 +215,12 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
     private void showInfoScreen(boolean flag) {
         if (flag) {
             bikeInfoWindow.setVisibility(View.GONE);
-            searchBikeWindow.animate().translationYBy(-searchBikeWindow.getHeight()).start();
+            searchBikeWindow.setVisibility(View.VISIBLE);
             fab.setVisibility(View.GONE);
         } else {
             bikeInfoWindow.setVisibility(View.VISIBLE);
-            searchBikeWindow.animate().translationYBy(searchBikeWindow.getHeight()).start();
+            searchBikeWindow.setVisibility(View.GONE);
+            fab.setVisibility(View.VISIBLE);
         }
     }
 
@@ -317,6 +319,7 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
         if (mMap != null) {
             mMap.clear();
             mMarkers.clear();
+            mPreviousMarker = null;
         }
 
     }
