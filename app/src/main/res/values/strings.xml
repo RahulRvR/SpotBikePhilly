@@ -10,6 +10,8 @@
 
     <string name="error_title">Error</string>
 
+    <string name="no_connectivity_message">A Valid network connection is required. Please try again later.</string>
+
     <string name="title_no_docks">No Docks</string>
 
     <string name="no_docks_message">No Docks available in the selected distance. Use the Slider to increase the search radius.</string>

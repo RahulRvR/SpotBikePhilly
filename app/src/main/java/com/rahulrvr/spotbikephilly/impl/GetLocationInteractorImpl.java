@@ -9,6 +9,7 @@ import com.rahulrvr.spotbikephilly.interfaces.GetLocationPresenter;
 import com.rahulrvr.spotbikephilly.pojo.BikeLocation;
 
 import retrofit.RestAdapter;
+import retrofit.RetrofitError;
 import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
 
@@ -41,7 +42,12 @@ public class GetLocationInteractorImpl implements GetLocationInteractor{
 
             @Override
             public void onError(Throwable e) {
-                mPresenter.onError();
+                if(e instanceof RetrofitError) {
+                    RetrofitError retrofitError = (RetrofitError)e;
+                    mPresenter.onError(retrofitError.getKind());
+                } else {
+                    mPresenter.onError(null);
+                }
             }
 
             @Override

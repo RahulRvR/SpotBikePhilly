@@ -4,6 +4,8 @@ import com.rahulrvr.spotbikephilly.pojo.Feature;
 
 import java.util.List;
 
+import retrofit.RetrofitError;
+
 /**
  *
  *
@@ -16,5 +18,5 @@ public interface GetLocationView {
 
     void hideProgressBar();
 
-    void onError();
+    void onError(RetrofitError.Kind kind);
 }

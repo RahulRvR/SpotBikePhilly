@@ -9,6 +9,8 @@ import com.rahulrvr.spotbikephilly.pojo.Feature;
 
 import java.util.List;
 
+import retrofit.RetrofitError;
+
 /**
  *
  *
@@ -43,8 +45,10 @@ public class GetLocationPresenterImpl implements GetLocationPresenter {
         mView.hideProgressBar();
     }
 
+
+
     @Override
-    public void onError() {
-        mView.onError();
+    public void onError(RetrofitError.Kind kind) {
+        mView.onError(kind);
     }
 }

@@ -42,6 +42,7 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
 import io.fabric.sdk.android.Fabric;
+import retrofit.RetrofitError;
 import rx.Observable;
 import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
@@ -282,9 +283,12 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
         }
     }
 
-    @Override
-    public void onError() {
 
+    @Override
+    public void onError(RetrofitError.Kind kind) {
+        if(kind == RetrofitError.Kind.NETWORK) {
+            showErrorMessage(R.string.error_title,R.string.no_connectivity_message);
+        }
     }
 
     private void setLocationsOnMap(final float distRange) {
