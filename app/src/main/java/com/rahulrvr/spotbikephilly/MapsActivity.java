@@ -314,6 +314,7 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
         if(kind == RetrofitError.Kind.NETWORK) {
             showErrorMessage(R.string.error_title,R.string.no_connectivity_message);
         }
+        progressBar.setVisibility(View.GONE);
     }
 
     private void setLocationsOnMap(final float distRange) {
@@ -396,6 +397,8 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
                 .content(message)
                 .positiveText(R.string.action_ok)
                 .show();
+
+        progressBar.setVisibility(View.GONE);
 
     }
 
