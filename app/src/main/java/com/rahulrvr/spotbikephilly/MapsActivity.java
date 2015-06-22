@@ -13,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -54,8 +55,10 @@ import rx.functions.Func1;
 public class MapsActivity extends AppCompatActivity implements GetLocationView, GoogleMap.OnMarkerClickListener {
 
     private static final int DEFAULT_ZOOM = 15;
+    private static final int DEFAULT_ZOOM_SHOW_ALL = 12;
     private static final float DEFAULT_MILE = 0.2f; //miles
     private static final int REFRESH_TIME = 60000;
+    private static final float  MAX_DIST = 4.0f;
 
     @InjectView(R.id.txtAddress)
     RobotoTextView txtAddress;
@@ -90,7 +93,7 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
     boolean mShowAll = false;
     HashMap<Marker, Feature> mMarkers = new HashMap<Marker, Feature>();
 
-
+    float mCurrentDistance = -1;
     @InjectView(R.id.fab)
     FloatingActionButton fab;
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
@@ -144,7 +147,9 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
                     @Override
                     public boolean onTouch(View v, MotionEvent event) {
                         if (event.getAction() == MotionEvent.ACTION_UP) {
-                            setLocationsOnMap(Float.parseFloat(s1));
+                            mCurrentDistance = Float.parseFloat(s1);
+                            mShowAll = false;
+                            setLocationsOnMap();
                         }
                         return false;
                     }
@@ -168,6 +173,17 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
 
             }
         }, REFRESH_TIME, REFRESH_TIME);
+
+
+        exploreAll.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                mShowAll = isChecked;
+                if(mLocationObservable !=null) {
+                    setLocationsOnMap();
+                }
+            }
+        });
 
 
     }
@@ -261,11 +277,6 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
     }
 
 
-    @OnClick(R.id.exploreAll)
-    public void showAll(View view) {
-        //TODO show all locations
-    }
-
     private void showInfoScreen(boolean flag) {
         if (flag) {
             bikeInfoWindow.setVisibility(View.GONE);
@@ -295,7 +306,7 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
         if (updateUI) {
             searchDistance.setEnabled(true);
             searchDistance.setSeekPinByValue(DEFAULT_MILE);
-            setLocationsOnMap(DEFAULT_MILE);
+            setLocationsOnMap();
             updateUI = false;
         }
     }
@@ -322,8 +333,11 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
         progressBar.setVisibility(View.GONE);
     }
 
-    private void setLocationsOnMap(final float distRange) {
+    private void setLocationsOnMap() {
         clearMarkers();
+        if(mCurrentDistance <0) {
+            mCurrentDistance =DEFAULT_MILE;
+        }
         mLocationObservable.filter(new Func1<Feature, Boolean>() {
             @Override
             public Boolean call(Feature feature) {
@@ -336,7 +350,7 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
                 location.setLatitude(latitude);
                 float distance = mCurrentLocation.distanceTo(location);
                 double distInMiles = distance / 1609.34;
-                return distInMiles <= distRange || mShowAll;
+                return distInMiles <= mCurrentDistance || mShowAll;
             }
         }).observeOn(AndroidSchedulers.mainThread()).subscribe(new Observer<Feature>() {
             @Override
@@ -344,8 +358,8 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
                 if(mMarkers.size() <=0) {
                     showErrorMessage(R.string.title_no_docks, R.string.no_docks_message);
                 }
-                updateSearchText(distRange);
-                setMapZoom((int) distRange);
+                updateSearchText(mCurrentDistance);
+                setMapZoom((int) mCurrentDistance);
             }
 
             @Override
@@ -379,16 +393,26 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
     }
 
     private void updateSearchText(float dist) {
+        String str =null;
+        if(mShowAll) {
+            str = String.format(getString(R.string.search_text), mMarkers.size(), MAX_DIST);
+        } else {
+            str = String.format(getString(R.string.search_text), mMarkers.size(), dist);
+        }
         txtTotalDocks.setVisibility(View.VISIBLE);
-        String str = String.format(getString(R.string.search_text), mMarkers.size(), dist);
         txtTotalDocks.setText(str);
+
     }
 
     private void setMapZoom(int zoomBy) {
         if (mCurrentLocation != null) {
             final LatLng mCurrentPos = new LatLng(mCurrentLocation.getLatitude(),
                     mCurrentLocation.getLongitude());
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mCurrentPos, DEFAULT_ZOOM - zoomBy));
+            if(mShowAll ) {
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mCurrentPos, DEFAULT_ZOOM_SHOW_ALL));
+            } else {
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mCurrentPos, DEFAULT_ZOOM - zoomBy));
+            }
         } else {
             showErrorMessage(R.string.error_title, R.string.location_not_found);
         }
