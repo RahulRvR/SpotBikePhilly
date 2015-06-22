@@ -14,7 +14,6 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.appyvet.rangebar.RangeBar;
@@ -36,6 +35,8 @@ import com.rahulrvr.spotbikephilly.pojo.Geometry;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -50,6 +51,7 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
 
     private static final int DEFAULT_ZOOM = 15;
     private static final float DEFAULT_MILE = 0.2f; //miles
+    private static final int REFRESH_TIME = 60000;
 
     @InjectView(R.id.txtAddress)
     RobotoTextView txtAddress;
@@ -77,6 +79,7 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
     GetLocationPresenter mPresenter;
     Location mCurrentLocation;
     Marker mPreviousMarker = null;
+    Marker mSelectedMarker = null;
     boolean updateUI = true;
 
     LatLng mSelectedCoOrdinates;
@@ -121,6 +124,20 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
 
         });
 
+        Timer timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mPresenter.getLocations(MapsActivity.this);
+                    }
+                });
+
+            }
+        }, REFRESH_TIME, REFRESH_TIME);
+
 
     }
 
@@ -130,7 +147,6 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
         super.onResume();
         setUpMapIfNeeded();
         mPresenter.getLocations(this);
-        showInfoScreen(true);
     }
 
     /**
@@ -191,19 +207,26 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
         if (mPreviousMarker != null) {
             mPreviousMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bike_map));
         }
-
+        mSelectedMarker = marker;
         mPreviousMarker = marker;
-        marker.setIcon(BitmapDescriptorFactory.defaultMarker(
-                BitmapDescriptorFactory.HUE_RED));
-        Feature feature = mMarkers.get(marker);
-        fab.setVisibility(View.VISIBLE);
-        txtFreeDocks.setText(String.format(getString(R.string.free_docks), feature.getProperties().getDocksAvailable()));
-        txtBikeAvl.setText(String.format(getString(R.string.bikes), feature.getProperties().getBikesAvailable()));
-        txtAddress.setText(feature.getProperties().getAddressStreet());
-        mSelectedCoOrdinates = new LatLng(feature.getGeometry().getCoordinates().get(1),
-                feature.getGeometry().getCoordinates().get(0));
-        showInfoScreen(false);
+        updateCurrentInfo(marker);
         return false;
+    }
+
+
+    private void updateCurrentInfo(Marker marker) {
+        if(marker != null) {
+            marker.setIcon(BitmapDescriptorFactory.defaultMarker(
+                    BitmapDescriptorFactory.HUE_RED));
+            Feature feature = mMarkers.get(marker);
+            fab.setVisibility(View.VISIBLE);
+            txtFreeDocks.setText(String.format(getString(R.string.free_docks), feature.getProperties().getDocksAvailable()));
+            txtBikeAvl.setText(String.format(getString(R.string.bikes), feature.getProperties().getBikesAvailable()));
+            txtAddress.setText(feature.getProperties().getAddressStreet());
+            mSelectedCoOrdinates = new LatLng(feature.getGeometry().getCoordinates().get(1),
+                    feature.getGeometry().getCoordinates().get(0));
+            showInfoScreen(false);
+        }
     }
 
 
@@ -237,9 +260,7 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
     @Override
     public void onLocationsReceived(List<Feature> locations) {
         mLocationObservable = Observable.from(locations);
-        Toast.makeText(this, Integer.toString(locations.size()), Toast.LENGTH_LONG).show();
-
-
+        //runs first time
         if (updateUI) {
             searchDistance.setEnabled(true);
             searchDistance.setSeekPinByValue(DEFAULT_MILE);
@@ -251,19 +272,14 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
     @Override
     public void showProgressBar() {
             progressBar.setVisibility(View.VISIBLE);
-            txtTotalDocks.setVisibility(View.GONE);
-            exploreAll.setVisibility(View.GONE);
-            searchDistance.setVisibility(View.GONE);
     }
 
     @Override
     public void hideProgressBar() {
-
         progressBar.setVisibility(View.GONE);
-        txtTotalDocks.setVisibility(View.VISIBLE);
-        exploreAll.setVisibility(View.VISIBLE);
-        searchDistance.setVisibility(View.VISIBLE);
-
+        if(mSelectedMarker != null) {
+            updateCurrentInfo(mSelectedMarker);
+        }
     }
 
     @Override
@@ -290,6 +306,9 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
         }).observeOn(AndroidSchedulers.mainThread()).subscribe(new Observer<Feature>() {
             @Override
             public void onCompleted() {
+                if(mMarkers.size() <=0) {
+                    showErrorMessage(R.string.title_no_docks, R.string.no_docks_message);
+                }
                 updateSearchText(distRange);
                 setMapZoom((int) distRange);
             }
@@ -325,6 +344,7 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
     }
 
     private void updateSearchText(float dist) {
+        txtTotalDocks.setVisibility(View.VISIBLE);
         String str = String.format(getString(R.string.search_text), mMarkers.size(), dist);
         txtTotalDocks.setText(str);
     }
