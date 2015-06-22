@@ -16,6 +16,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.appyvet.rangebar.RangeBar;
@@ -106,10 +107,14 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
 
         switch (item.getItemId()) {
             case R.id.menu_about:
+
+                View view = getLayoutInflater().inflate(R.layout.layout_help,null);
+                TextView textView = (TextView) view.findViewById(R.id.version);
+                textView.setText(BuildConfig.VERSION_NAME);
                 new MaterialDialog.Builder(this)
                         .positiveColorRes(R.color.primary)
                         .title(R.string.about_title)
-                        .customView(R.layout.layout_help, true)
+                        .customView(view, true)
                         .positiveText(R.string.action_ok)
                         .show();
                 return true;

@@ -42,4 +42,6 @@
     <string name="roboto_text_view">Roboto Text View</string>
     <string name="roboto_text_view_url">https://github.com/johnkil/Android-RobotoTextView"</string>
 
+    <string name="version">Version</string>
+
 </resources>

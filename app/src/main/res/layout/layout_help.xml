@@ -77,4 +77,20 @@
         android:layout_height="wrap_content" />
 
 
+    <TextView
+        style="@style/aboutHeader"
+        android:text="@string/version"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/version"
+        android:paddingTop="5dp"
+        android:text="@string/version"
+        android:autoLink="web"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+
+
 </LinearLayout>
