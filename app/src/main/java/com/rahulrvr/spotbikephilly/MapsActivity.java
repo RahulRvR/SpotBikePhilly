@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SwitchCompat;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -91,6 +93,29 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
     @InjectView(R.id.fab)
     FloatingActionButton fab;
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.about_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case R.id.menu_about:
+                new MaterialDialog.Builder(this)
+                        .positiveColorRes(R.color.primary)
+                        .title(R.string.about_title)
+                        .customView(R.layout.layout_help, true)
+                        .positiveText(R.string.action_ok)
+                        .show();
+                return true;
+        }
+        return false;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

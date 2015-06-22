@@ -67,10 +67,8 @@ dependencies {
     compile 'com.jakewharton:butterknife:6.1.0'
     compile 'io.reactivex:rxjava:1.0.10'
     compile 'io.reactivex:rxandroid:0.24.0'
-    compile 'com.sothree.slidinguppanel:library:3.0.0'
     compile 'com.appyvet:materialrangebar:1.0'
     compile 'com.afollestad:material-dialogs:0.7.6.0'
-    compile 'com.pnikosis:materialish-progress:1.5'
     compile 'com.github.johnkil.android-robototextview:robototextview:2.4.0'
     compile('com.crashlytics.sdk.android:crashlytics:2.3.2@aar') {
         transitive = true;
