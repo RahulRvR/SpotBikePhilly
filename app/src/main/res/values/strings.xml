@@ -18,7 +18,7 @@
 
     <string name="title_no_docks">No Docks</string>
 
-    <string name="no_docks_message">No Docks available in the selected distance. Use the Slider to increase the search radius.</string>
+    <string name="no_docks_message">No Docks available in the selected distance.</string>
 
     <string name="location_not_found">Could not detect current location, Please try again later.</string>
 

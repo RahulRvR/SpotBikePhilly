@@ -5,6 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+
+
     <fragment
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
@@ -13,7 +15,11 @@
         tools:context=".MapsActivity"
         tools:layout="@layout/abc_activity_chooser_view" />
 
-
+    <include
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        layout="@layout/toolbar"/>
 
 
     <RelativeLayout
@@ -48,7 +54,5 @@
         android:layout_gravity="top"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
-
-
 
 </FrameLayout>

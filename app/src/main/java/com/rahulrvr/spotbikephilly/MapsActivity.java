@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SwitchCompat;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -116,7 +117,7 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
                 textView.setText(BuildConfig.VERSION_NAME);
                 new MaterialDialog.Builder(this)
                         .positiveColorRes(R.color.primary)
-                        .title(R.string.about_title)
+                        .title(R.string.app_name)
                         .customView(view, true)
                         .positiveText(R.string.action_ok)
                         .show();
@@ -148,6 +149,7 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
                     public boolean onTouch(View v, MotionEvent event) {
                         if (event.getAction() == MotionEvent.ACTION_UP) {
                             mCurrentDistance = Float.parseFloat(s1);
+                            exploreAll.setChecked(false);
                             mShowAll = false;
                             setLocationsOnMap();
                         }
@@ -159,6 +161,8 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
 
 
         });
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         Timer timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
