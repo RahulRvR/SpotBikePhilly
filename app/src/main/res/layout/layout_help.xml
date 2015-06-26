@@ -44,18 +44,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <TextView
-        style="@style/aboutHeader"
-        android:text="@string/roboto_text_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <TextView
-        android:text="@string/roboto_text_view_url"
-        android:autoLink="web"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
 
 
     <TextView

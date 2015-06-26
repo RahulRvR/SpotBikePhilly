@@ -26,7 +26,7 @@
 
 
 
-    <com.devspark.robototextview.widget.RobotoTextView
+    <TextView
         android:id="@+id/txtAddress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -34,12 +34,10 @@
         android:layout_alignParentTop="true"
         android:layout_marginBottom="10dp"
         android:text="1835 Market Street"
-        android:textColor="@color/icons"
-        app:fontFamily="roboto_slab"
-        app:textWeight="bold" />
+        android:textColor="@color/icons" />
 
 
-    <com.devspark.robototextview.widget.RobotoTextView
+    <TextView
         android:id="@+id/txtFreeDocks"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -50,10 +48,9 @@
         android:padding="5dp"
         android:text="Free Docks : 23"
         android:textColor="?colorPrimary"
-        app:fontFamily="roboto_slab"
-        app:textWeight="light" />
+     />
 
-    <com.devspark.robototextview.widget.RobotoTextView
+    <TextView
         android:id="@+id/txtBikeAvl"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -65,8 +62,7 @@
         android:padding="5dp"
         android:text="Bikes : 0"
         android:textColor="?colorPrimary"
-        app:fontFamily="roboto_slab"
-        app:textWeight="light" />
+  />
 
 
 </RelativeLayout>

@@ -24,7 +24,11 @@
 
     <string name="action_ok">OK</string>
 
-
+    <!-- Typeface names -->
+    <string name="typeface_roboto_regular">RobotoSlab-Regular</string>
+    <string name="typeface_roboto_light">RobotoSlab-Light</string>
+    <string name="typeface_roboto_thin">RobotoSlab-Thin</string>
+    <string name="typeface_roboto_bold">RobotoSlab-Bold</string>
 
     <string name="range_bar">Custom Range Bar Slider</string>
     <string name="range_bar_url">https://github.com/edmodo/range-bar</string>

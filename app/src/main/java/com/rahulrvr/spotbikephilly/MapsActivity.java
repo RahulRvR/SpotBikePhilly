@@ -23,7 +23,6 @@ import android.widget.TextView;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.appyvet.rangebar.RangeBar;
 import com.crashlytics.android.Crashlytics;
-import com.devspark.robototextview.widget.RobotoTextView;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -62,17 +61,17 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
     private static final float  MAX_DIST = 4.0f;
 
     @InjectView(R.id.txtAddress)
-    RobotoTextView txtAddress;
+    TextView txtAddress;
     @InjectView(R.id.txtFreeDocks)
-    RobotoTextView txtFreeDocks;
+    TextView txtFreeDocks;
     @InjectView(R.id.txtBikeAvl)
-    RobotoTextView txtBikeAvl;
+    TextView txtBikeAvl;
     @InjectView(R.id.bikeInfoWindow)
     RelativeLayout bikeInfoWindow;
     @InjectView(R.id.searchDistance)
     RangeBar searchDistance;
     @InjectView(R.id.txtTotalDocks)
-    RobotoTextView txtTotalDocks;
+    TextView txtTotalDocks;
     @InjectView(R.id.exploreAll)
     SwitchCompat exploreAll;
     @InjectView(R.id.searchBikeWindow)
@@ -188,6 +187,15 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
                 }
             }
         });
+
+        txtAddress.setTypeface(
+                ManagerTypeface.getTypeface(this, R.string.typeface_roboto_bold));
+        txtFreeDocks.setTypeface(
+                ManagerTypeface.getTypeface(this, R.string.typeface_roboto_light));
+        txtBikeAvl.setTypeface(
+                ManagerTypeface.getTypeface(this, R.string.typeface_roboto_light));
+        txtTotalDocks.setTypeface(
+                ManagerTypeface.getTypeface(this, R.string.typeface_roboto_light));
 
 
     }
