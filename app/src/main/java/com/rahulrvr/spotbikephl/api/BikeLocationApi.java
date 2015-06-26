@@ -1,6 +1,6 @@
-package com.rahulrvr.spotbikephilly.api;
+package com.rahulrvr.spotbikephl.api;
 
-import com.rahulrvr.spotbikephilly.pojo.BikeLocation;
+import com.rahulrvr.spotbikephl.pojo.BikeLocation;
 
 import retrofit.http.GET;
 import rx.Observable;

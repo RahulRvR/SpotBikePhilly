@@ -1,4 +1,4 @@
-package com.rahulrvr.spotbikephilly;
+package com.rahulrvr.spotbikephl;
 
 import android.content.Context;
 import android.content.Intent;
@@ -31,11 +31,11 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.rahulrvr.spotbikephilly.impl.GetLocationPresenterImpl;
-import com.rahulrvr.spotbikephilly.interfaces.GetLocationPresenter;
-import com.rahulrvr.spotbikephilly.interfaces.GetLocationView;
-import com.rahulrvr.spotbikephilly.pojo.Feature;
-import com.rahulrvr.spotbikephilly.pojo.Geometry;
+import com.rahulrvr.spotbikephl.impl.GetLocationPresenterImpl;
+import com.rahulrvr.spotbikephl.interfaces.GetLocationPresenter;
+import com.rahulrvr.spotbikephl.interfaces.GetLocationView;
+import com.rahulrvr.spotbikephl.pojo.Feature;
+import com.rahulrvr.spotbikephl.pojo.Geometry;
 
 import java.util.HashMap;
 import java.util.List;

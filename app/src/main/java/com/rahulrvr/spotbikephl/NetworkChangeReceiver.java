@@ -1,4 +1,4 @@
-package com.rahulrvr.spotbikephilly;
+package com.rahulrvr.spotbikephl;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

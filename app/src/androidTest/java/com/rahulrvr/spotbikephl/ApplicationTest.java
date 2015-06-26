@@ -1,4 +1,4 @@
-package com.rahulrvr.spotbikephilly;
+package com.rahulrvr.spotbikephl;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

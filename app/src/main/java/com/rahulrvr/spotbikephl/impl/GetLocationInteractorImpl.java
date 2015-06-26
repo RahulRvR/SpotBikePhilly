@@ -1,12 +1,12 @@
-package com.rahulrvr.spotbikephilly.impl;
+package com.rahulrvr.spotbikephl.impl;
 
 import android.content.Context;
 
-import com.rahulrvr.spotbikephilly.BuildConfig;
-import com.rahulrvr.spotbikephilly.api.BikeLocationApi;
-import com.rahulrvr.spotbikephilly.interfaces.GetLocationInteractor;
-import com.rahulrvr.spotbikephilly.interfaces.GetLocationPresenter;
-import com.rahulrvr.spotbikephilly.pojo.BikeLocation;
+import com.rahulrvr.spotbikephl.BuildConfig;
+import com.rahulrvr.spotbikephl.api.BikeLocationApi;
+import com.rahulrvr.spotbikephl.interfaces.GetLocationInteractor;
+import com.rahulrvr.spotbikephl.interfaces.GetLocationPresenter;
+import com.rahulrvr.spotbikephl.pojo.BikeLocation;
 
 import retrofit.RestAdapter;
 import retrofit.RetrofitError;

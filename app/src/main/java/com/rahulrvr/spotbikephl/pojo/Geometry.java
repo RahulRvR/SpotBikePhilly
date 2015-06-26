@@ -1,4 +1,4 @@
-package com.rahulrvr.spotbikephilly.pojo;
+package com.rahulrvr.spotbikephl.pojo;
 
 import com.google.gson.annotations.Expose;
 

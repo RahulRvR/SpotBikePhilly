@@ -1,11 +1,11 @@
-package com.rahulrvr.spotbikephilly.impl;
+package com.rahulrvr.spotbikephl.impl;
 
 import android.content.Context;
 
-import com.rahulrvr.spotbikephilly.interfaces.GetLocationInteractor;
-import com.rahulrvr.spotbikephilly.interfaces.GetLocationPresenter;
-import com.rahulrvr.spotbikephilly.interfaces.GetLocationView;
-import com.rahulrvr.spotbikephilly.pojo.Feature;
+import com.rahulrvr.spotbikephl.interfaces.GetLocationInteractor;
+import com.rahulrvr.spotbikephl.interfaces.GetLocationPresenter;
+import com.rahulrvr.spotbikephl.interfaces.GetLocationView;
+import com.rahulrvr.spotbikephl.pojo.Feature;
 
 import java.util.List;
 

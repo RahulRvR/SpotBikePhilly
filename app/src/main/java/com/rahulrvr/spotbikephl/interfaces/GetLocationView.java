@@ -1,6 +1,6 @@
-package com.rahulrvr.spotbikephilly.interfaces;
+package com.rahulrvr.spotbikephl.interfaces;
 
-import com.rahulrvr.spotbikephilly.pojo.Feature;
+import com.rahulrvr.spotbikephl.pojo.Feature;
 
 import java.util.List;
 

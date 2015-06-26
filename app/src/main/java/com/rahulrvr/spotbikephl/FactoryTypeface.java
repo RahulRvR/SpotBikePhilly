@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Elsevier, Inc. All rights reserved.
  */
 
-package com.rahulrvr.spotbikephilly;
+package com.rahulrvr.spotbikephl;
 
 import android.content.Context;
 import android.graphics.Typeface;
