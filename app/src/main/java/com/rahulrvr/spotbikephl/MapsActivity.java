@@ -1,28 +1,22 @@
 package com.rahulrvr.spotbikephl;
 
-import android.content.Context;
-import android.content.Intent;
 import android.location.Location;
-import android.location.LocationManager;
-import android.net.Uri;
+import android.location.LocationListener;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.SwitchCompat;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.CompoundButton;
-import android.widget.FrameLayout;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.appyvet.rangebar.RangeBar;
 import com.crashlytics.android.Crashlytics;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -31,11 +25,13 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.rahulrvr.spotbikephl.custom.BikeIndicator;
 import com.rahulrvr.spotbikephl.impl.GetLocationPresenterImpl;
 import com.rahulrvr.spotbikephl.interfaces.GetLocationPresenter;
 import com.rahulrvr.spotbikephl.interfaces.GetLocationView;
 import com.rahulrvr.spotbikephl.pojo.Feature;
 import com.rahulrvr.spotbikephl.pojo.Geometry;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import java.util.HashMap;
 import java.util.List;
@@ -44,7 +40,6 @@ import java.util.TimerTask;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
-import butterknife.OnClick;
 import io.fabric.sdk.android.Fabric;
 import retrofit.RetrofitError;
 import rx.Observable;
@@ -52,13 +47,17 @@ import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
 
-public class MapsActivity extends AppCompatActivity implements GetLocationView, GoogleMap.OnMarkerClickListener {
+public class MapsActivity extends AppCompatActivity implements GetLocationView, GoogleMap.OnMarkerClickListener,
+        GoogleApiClient.ConnectionCallbacks, LocationListener, GoogleApiClient.OnConnectionFailedListener {
 
     private static final int DEFAULT_ZOOM = 15;
     private static final int DEFAULT_ZOOM_SHOW_ALL = 12;
-    private static final float DEFAULT_MILE = 0.2f; //miles
+    private static final float DEFAULT_MILE = 1.0f; //miles
     private static final int REFRESH_TIME = 60000;
-    private static final float  MAX_DIST = 4.0f;
+    private static final float MAX_DIST = 4.0f;
+
+    private static final int PANEL_HEIGHT = 150;
+    private static final int PANEL_HEIGHT_ZERO = 0;
 
     @InjectView(R.id.txtAddress)
     TextView txtAddress;
@@ -66,20 +65,14 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
     TextView txtFreeDocks;
     @InjectView(R.id.txtBikeAvl)
     TextView txtBikeAvl;
-    @InjectView(R.id.bikeInfoWindow)
-    RelativeLayout bikeInfoWindow;
     @InjectView(R.id.searchDistance)
     RangeBar searchDistance;
-    @InjectView(R.id.txtTotalDocks)
-    TextView txtTotalDocks;
-    @InjectView(R.id.exploreAll)
-    SwitchCompat exploreAll;
-    @InjectView(R.id.searchBikeWindow)
-    RelativeLayout searchBikeWindow;
-    @InjectView(R.id.mainLayout)
-    FrameLayout mainLayout;
     @InjectView(R.id.progressBar)
     ProgressBar progressBar;
+    @InjectView(R.id.sliding_layout)
+    SlidingUpPanelLayout slidingLayout;
+    @InjectView(R.id.bikeIndicator)
+    BikeIndicator bikeIndicator;
 
     private Observable<Feature> mLocationObservable;
 
@@ -94,36 +87,11 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
     HashMap<Marker, Feature> mMarkers = new HashMap<Marker, Feature>();
 
     float mCurrentDistance = -1;
-    @InjectView(R.id.fab)
-    FloatingActionButton fab;
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
 
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.about_menu, menu);
-        return super.onCreateOptionsMenu(menu);
-    }
+    GoogleApiClient mGoogleApiClient;
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        switch (item.getItemId()) {
-            case R.id.menu_about:
-
-                View view = getLayoutInflater().inflate(R.layout.layout_help,null);
-                TextView textView = (TextView) view.findViewById(R.id.version);
-                textView.setText(BuildConfig.VERSION_NAME);
-                new MaterialDialog.Builder(this)
-                        .positiveColorRes(R.color.primary)
-                        .title(R.string.app_name)
-                        .customView(view, true)
-                        .positiveText(R.string.action_ok)
-                        .show();
-                return true;
-        }
-        return false;
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -133,7 +101,6 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
         }
         setContentView(R.layout.activity_maps);
         ButterKnife.inject(this);
-        setUpMapIfNeeded();
         mPresenter = new GetLocationPresenterImpl(this);
         searchDistance.setRangePinsByIndices(0, 0);
         searchDistance.setEnabled(false);
@@ -148,7 +115,6 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
                     public boolean onTouch(View v, MotionEvent event) {
                         if (event.getAction() == MotionEvent.ACTION_UP) {
                             mCurrentDistance = Float.parseFloat(s1);
-                            exploreAll.setChecked(false);
                             mShowAll = false;
                             setLocationsOnMap();
                         }
@@ -160,8 +126,8 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
 
 
         });
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+
+
 
         Timer timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
@@ -177,27 +143,25 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
             }
         }, REFRESH_TIME, REFRESH_TIME);
 
-
-        exploreAll.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                mShowAll = isChecked;
-                if(mLocationObservable !=null) {
-                    setLocationsOnMap();
-                }
-            }
-        });
-
         txtAddress.setTypeface(
                 ManagerTypeface.getTypeface(this, R.string.typeface_roboto_bold));
         txtFreeDocks.setTypeface(
-                ManagerTypeface.getTypeface(this, R.string.typeface_roboto_light));
+                ManagerTypeface.getTypeface(this, R.string.typeface_roboto_thin));
         txtBikeAvl.setTypeface(
-                ManagerTypeface.getTypeface(this, R.string.typeface_roboto_light));
-        txtTotalDocks.setTypeface(
-                ManagerTypeface.getTypeface(this, R.string.typeface_roboto_light));
+                ManagerTypeface.getTypeface(this, R.string.typeface_roboto_thin));
 
+        buildGoogleApiClient();
+        setUpMapIfNeeded();
+        hidePanel();
+    }
 
+    protected synchronized void buildGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+        mGoogleApiClient.connect();
     }
 
 
@@ -207,6 +171,34 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
         setUpMapIfNeeded();
         mPresenter.getLocations(this);
     }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.about_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case R.id.menu_about:
+
+                View view = getLayoutInflater().inflate(R.layout.layout_help, null);
+                TextView textView = (TextView) view.findViewById(R.id.version);
+                textView.setText(BuildConfig.VERSION_NAME);
+                new MaterialDialog.Builder(this)
+                        .positiveColorRes(R.color.primary)
+                        .title(R.string.app_name)
+                        .customView(view, true)
+                        .positiveText(R.string.action_ok)
+                        .show();
+                return true;
+        }
+        return false;
+    }
+
 
     /**
      * Sets up the map if it is possible to do so (i.e., the Google Play services APK is correctly
@@ -245,42 +237,33 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
     private void setUpMap() {
         mMap.setMyLocationEnabled(true);
         mMap.setOnMarkerClickListener(this);
-        LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        mCurrentLocation = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        setMapZoom(0);
-    }
-
-
-    @OnClick(R.id.fab)
-    public void navigate(View view) {
-        String str = "daddr=" + mSelectedCoOrdinates.latitude + "," + mSelectedCoOrdinates.longitude;
-        Intent intent = new Intent(Intent.ACTION_VIEW,
-                Uri.parse("http://maps.google.com/maps?" + str));
-        startActivity(intent);
-
     }
 
     @Override
     public boolean onMarkerClick(Marker marker) {
 
         if (mPreviousMarker != null) {
-            mPreviousMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bike_map));
+            Feature feature = mMarkers.get(marker);
+            mPreviousMarker.setIcon(BitmapDescriptorFactory.fromResource(getColoredIcon(getAvailabilityPercentage(feature))));
         }
         mSelectedMarker = marker;
         mPreviousMarker = marker;
         updateCurrentInfo(marker);
+        showPanel();
         return false;
     }
 
 
     private void updateCurrentInfo(Marker marker) {
-        if(marker != null) {
+        if (marker != null) {
             marker.setIcon(BitmapDescriptorFactory.defaultMarker(
                     BitmapDescriptorFactory.HUE_RED));
             Feature feature = mMarkers.get(marker);
-            fab.setVisibility(View.VISIBLE);
-            txtFreeDocks.setText(String.format(getString(R.string.free_docks), feature.getProperties().getDocksAvailable()));
-            txtBikeAvl.setText(String.format(getString(R.string.bikes), feature.getProperties().getBikesAvailable()));
+
+            bikeIndicator.setBikePercentage(getAvailabilityPercentage(feature));
+
+            txtFreeDocks.setText(String.format("%02d", feature.getProperties().getDocksAvailable()));
+            txtBikeAvl.setText(String.format("%02d", feature.getProperties().getBikesAvailable()));
             txtAddress.setText(feature.getProperties().getAddressStreet());
             mSelectedCoOrdinates = new LatLng(feature.getGeometry().getCoordinates().get(1),
                     feature.getGeometry().getCoordinates().get(0));
@@ -290,25 +273,18 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
 
 
     private void showInfoScreen(boolean flag) {
-        if (flag) {
-            bikeInfoWindow.setVisibility(View.GONE);
-            searchBikeWindow.setVisibility(View.VISIBLE);
-            fab.setVisibility(View.GONE);
-        } else {
-            bikeInfoWindow.setVisibility(View.VISIBLE);
-            searchBikeWindow.setVisibility(View.GONE);
-            fab.setVisibility(View.VISIBLE);
-        }
+       //TODO
     }
 
 
     @Override
     public void onBackPressed() {
-        if (bikeInfoWindow.isShown()) {
-            showInfoScreen(true);
-        } else {
-            super.onBackPressed();
-        }
+
+       if(slidingLayout.getPanelState().equals(SlidingUpPanelLayout.PanelState.HIDDEN)) {
+           super.onBackPressed();
+       } else {
+          hidePanel();
+       }
     }
 
     @Override
@@ -325,13 +301,13 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
 
     @Override
     public void showProgressBar() {
-            progressBar.setVisibility(View.VISIBLE);
+        progressBar.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void hideProgressBar() {
         progressBar.setVisibility(View.GONE);
-        if(mSelectedMarker != null) {
+        if (mSelectedMarker != null) {
             updateCurrentInfo(mSelectedMarker);
         }
     }
@@ -339,16 +315,104 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
 
     @Override
     public void onError(RetrofitError.Kind kind) {
-        if(kind == RetrofitError.Kind.NETWORK) {
-            showErrorMessage(R.string.error_title,R.string.no_connectivity_message);
+        if (kind == RetrofitError.Kind.NETWORK) {
+            showErrorMessage(R.string.error_title, R.string.no_connectivity_message);
         }
         progressBar.setVisibility(View.GONE);
     }
 
+
+    public void clearMarkers() {
+        if (mMap != null) {
+            mMap.clear();
+            mMarkers.clear();
+            mPreviousMarker = null;
+        }
+
+    }
+
+    private void updateSearchText(float dist) {
+        String str = null;
+        if (mShowAll) {
+            str = String.format(getString(R.string.search_text), mMarkers.size(), MAX_DIST);
+        } else {
+            str = String.format(getString(R.string.search_text), mMarkers.size(), dist);
+        }
+//        txtTotalDocks.setVisibility(View.VISIBLE);
+//        txtTotalDocks.setText(str);
+
+    }
+
+    private void setMapZoom(int zoomBy) {
+        if (mCurrentLocation != null) {
+            final LatLng mCurrentPos = new LatLng(mCurrentLocation.getLatitude(),
+                    mCurrentLocation.getLongitude());
+            if (mShowAll) {
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mCurrentPos, DEFAULT_ZOOM_SHOW_ALL));
+            } else {
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mCurrentPos, DEFAULT_ZOOM - zoomBy));
+            }
+        } else {
+            showErrorMessage(R.string.error_title, R.string.location_not_found);
+        }
+    }
+
+
+    private void showErrorMessage(int title, int message) {
+        new MaterialDialog.Builder(this)
+                .positiveColorRes(R.color.primary)
+                .title(title)
+                .content(message)
+                .positiveText(R.string.action_ok)
+                .show();
+
+        progressBar.setVisibility(View.GONE);
+
+    }
+
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(
+                mGoogleApiClient);
+        setMapZoom(0);
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        mCurrentLocation = location;
+        setLocationsOnMap();
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+
+    }
+
     private void setLocationsOnMap() {
         clearMarkers();
-        if(mCurrentDistance <0) {
-            mCurrentDistance =DEFAULT_MILE;
+        if (mCurrentDistance < 0) {
+            mCurrentDistance = DEFAULT_MILE;
         }
         mLocationObservable.filter(new Func1<Feature, Boolean>() {
             @Override
@@ -367,7 +431,7 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
         }).observeOn(AndroidSchedulers.mainThread()).subscribe(new Observer<Feature>() {
             @Override
             public void onCompleted() {
-                if(mMarkers.size() <=0) {
+                if (mMarkers.size() <= 0) {
                     showErrorMessage(R.string.title_no_docks, R.string.no_docks_message);
                 }
                 updateSearchText(mCurrentDistance);
@@ -389,58 +453,34 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
                 Marker marker = mMap.addMarker(new MarkerOptions()
                         .anchor(0.0f, 1.0f)
                         .position(point));
-                marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bike_map));
+                int percentage = getAvailabilityPercentage(feature);
+                marker.setIcon(BitmapDescriptorFactory.fromResource(getColoredIcon(percentage)));
                 mMarkers.put(marker, feature);
             }
         });
     }
 
-    public void clearMarkers() {
-        if (mMap != null) {
-            mMap.clear();
-            mMarkers.clear();
-            mPreviousMarker = null;
-        }
 
+    private int getAvailabilityPercentage(Feature feature) {
+        return (feature.getProperties().getBikesAvailable() * 100) / feature.getProperties().getTotalDocks();
     }
 
-    private void updateSearchText(float dist) {
-        String str =null;
-        if(mShowAll) {
-            str = String.format(getString(R.string.search_text), mMarkers.size(), MAX_DIST);
+    private int getColoredIcon(int percentage) {
+        if (percentage > 40) {
+            return R.drawable.ic_bike_green;
+        } else if (percentage > 10) {
+            return R.drawable.ic_bike_yellow;
         } else {
-            str = String.format(getString(R.string.search_text), mMarkers.size(), dist);
-        }
-        txtTotalDocks.setVisibility(View.VISIBLE);
-        txtTotalDocks.setText(str);
-
-    }
-
-    private void setMapZoom(int zoomBy) {
-        if (mCurrentLocation != null) {
-            final LatLng mCurrentPos = new LatLng(mCurrentLocation.getLatitude(),
-                    mCurrentLocation.getLongitude());
-            if(mShowAll ) {
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mCurrentPos, DEFAULT_ZOOM_SHOW_ALL));
-            } else {
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mCurrentPos, DEFAULT_ZOOM - zoomBy));
-            }
-        } else {
-            showErrorMessage(R.string.error_title, R.string.location_not_found);
+            return R.drawable.ic_bike_red;
         }
     }
 
+    private void showPanel() {
+        slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+    }
 
-    private void showErrorMessage(int title, int message) {
-        new MaterialDialog.Builder(this)
-                .positiveColorRes(R.color.primary)
-                .title(title)
-                .content(message)
-                .positiveText(R.string.action_ok)
-                .show();
-
-        progressBar.setVisibility(View.GONE);
-
+    private void hidePanel() {
+        slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
     }
 
 }

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:padding="10dp"
+    tools:background="@color/primary"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <TextView
+            tools:text="15"
+            android:textSize="45sp"
+            android:textColor="@color/icons"
+            android:id="@+id/txtBikeAvl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <TextView
+            tools:text="Bikes"
+            android:text="@string/label_bikes"
+            android:textColor="@color/icons"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+    <View
+        android:background="@color/icons"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_width="1dp"
+        android:layout_height="match_parent"/>
+    <LinearLayout
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <TextView
+            tools:text="5"
+            android:textSize="45sp"
+            android:textColor="@color/icons"
+            android:id="@+id/txtFreeDocks"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <TextView
+            tools:text="Free Docks"
+            android:text="@string/label_free_docks"
+            android:textColor="@color/icons"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+</LinearLayout>

@@ -5,6 +5,6 @@
         android:id="@+id/menu_about"
         android:title="@string/about"
         android:icon="@drawable/ic_action_about"
-        yourapp:showAsAction="always" />
+        yourapp:showAsAction="never" />
 
 </menu>

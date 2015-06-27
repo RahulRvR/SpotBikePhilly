@@ -26,7 +26,7 @@ android {
     buildToolsVersion "22.0.1"
 
     defaultConfig {
-        applicationId "com.rahulrvr.spotbikephilly"
+        applicationId "com.rahulrvr.spotbikephl"
         minSdkVersion 16
         targetSdkVersion 22
         versionCode versionMajor * 10000 + versionMinor * 1000 + versionPatch * 100 + versionBuild
@@ -75,6 +75,7 @@ dependencies {
     compile 'io.reactivex:rxandroid:0.24.0'
     compile 'com.appyvet:materialrangebar:1.0'
     compile 'com.afollestad:material-dialogs:0.7.6.0'
+    compile 'com.sothree.slidinguppanel:library:3.0.0'
     compile('com.crashlytics.sdk.android:crashlytics:2.3.2@aar') {
         transitive = true;
     }

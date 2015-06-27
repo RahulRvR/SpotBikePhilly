@@ -1,68 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/bikeInfoWindow"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:padding="10dp"
-    android:paddingTop="20dp"
-    android:paddingBottom="20dp"
+    android:layout_height="150dp"
+    android:orientation="horizontal"
+    android:layout_gravity="center"
     tools:background="?attr/colorPrimary">
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
+
+    <RelativeLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/txtAddress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginBottom="10dp"
+            android:maxLines="1"
+            android:text="1835 Market Street Christian Street"
+            android:textColor="@color/icons"
+            android:textSize="20sp" />
+
+        <com.rahulrvr.spotbikephl.custom.BikeIndicator
+            android:id="@+id/bikeIndicator"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_below="@id/txtAddress"
+            android:layout_gravity="center_vertical" />
+
+    </RelativeLayout>
+
+    <include
+        layout="@layout/count_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
-        android:clickable="true"
-        android:src="@drawable/ic_maps_directions_walk"
-        app:elevation="6dp"
-        app:layout_anchor="@+id/toolbar"
-        app:layout_anchorGravity="right"
-        app:pressedTranslationZ="12dp" />
+        android:layout_gravity="center_vertical" />
 
 
-
-    <TextView
-        android:id="@+id/txtAddress"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginBottom="10dp"
-        android:text="1835 Market Street"
-        android:textColor="@color/icons" />
-
-
-    <TextView
-        android:id="@+id/txtFreeDocks"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@id/txtAddress"
-        android:background="@drawable/circle_button"
-        android:gravity="center"
-        android:padding="5dp"
-        android:text="Free Docks : 23"
-        android:textColor="?colorPrimary"
-     />
-
-    <TextView
-        android:id="@+id/txtBikeAvl"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/txtAddress"
-        android:layout_marginLeft="5dp"
-        android:layout_toRightOf="@+id/txtFreeDocks"
-        android:background="@drawable/circle_button"
-        android:gravity="center"
-        android:padding="5dp"
-        android:text="Bikes : 0"
-        android:textColor="?colorPrimary"
-  />
-
-
-</RelativeLayout>
+</LinearLayout>

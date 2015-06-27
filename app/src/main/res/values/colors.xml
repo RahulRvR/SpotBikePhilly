@@ -11,4 +11,12 @@
     <color name="secondary_text">#727272</color>
     <color name="icons">#FFFFFF</color>
     <color name="divider">#B6B6B6</color>
+
+
+    <color name="green">#4caf50</color>
+    <color name="red">#f44336</color>
+    <color name="yellow">#ffc107</color>
+    <color name="blue">#03a9f4</color>
+
+
 </resources>

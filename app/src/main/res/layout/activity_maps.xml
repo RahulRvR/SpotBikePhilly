@@ -1,58 +1,75 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:wheel="http://schemas.android.com/apk/res-auto"
+<com.sothree.slidinguppanel.SlidingUpPanelLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:sothree="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/mainLayout"
+    android:id="@+id/sliding_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:gravity="bottom"
+    sothree:umanoPanelHeight="150dp"
+    sothree:umanoShadowHeight="4dp">
 
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            android:background="@drawable/progress_background"
+            android:indeterminate="true" />
 
-    <fragment
+        <fragment
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".MapsActivity"
         tools:layout="@layout/abc_activity_chooser_view" />
-
-    <include
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="top"
-        layout="@layout/toolbar"/>
+    </FrameLayout>
 
 
     <RelativeLayout
-        android:orientation="vertical"
-        android:background="?attr/colorPrimary"
-        android:layout_gravity="bottom"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="250dp"
+        android:layout_gravity="bottom"
+        android:padding="10dp"
+        android:visibility="gone"
+        android:background="?attr/colorPrimary">
 
-
-        <include
-            layout="@layout/bike_info_layout"
+        <include layout="@layout/bike_info_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:visibility="gone" />
+            />
 
-        <include
-            layout="@layout/bike_search_layout"
+        <com.appyvet.rangebar.RangeBar xmlns:custom="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/searchDistance"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom" />
+            android:layout_height="72dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentTop="true"
+            custom:barColor="@color/icons"
+            custom:connectingLineColor="@color/icons"
+            custom:pinColor="@color/icons"
+            custom:rangeBar="false"
+            custom:selectorColor="@color/icons"
+            custom:textColor="@color/primary"
+            custom:tickColor="@color/icons"
+            custom:tickEnd="4.0"
+            custom:tickInterval="0.2"
+            custom:tickStart="0.0" />
 
+        <TextView
+            android:id="@+id/searchDistanceLabel"
+            android:layout_below="@id/searchDistance"
+            android:text="@string/label_serach_distance"
+            android:textColor="@color/icons"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
     </RelativeLayout>
 
-    <ProgressBar
-        android:id="@+id/progressBar"
-        android:background="@drawable/progress_background"
-        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-        android:indeterminate="true"
-        android:layout_gravity="top"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
 
-</FrameLayout>
+</com.sothree.slidinguppanel.SlidingUpPanelLayout>

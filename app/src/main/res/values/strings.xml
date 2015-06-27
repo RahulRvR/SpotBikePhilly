@@ -47,5 +47,8 @@
     <string name="roboto_text_view_url">https://github.com/johnkil/Android-RobotoTextView"</string>
 
     <string name="version">Version</string>
+    <string name="label_bikes">Bikes</string>
+    <string name="label_free_docks">Free Docks</string>
+    <string name="label_serach_distance">Search Radius</string>
 
 </resources>
