@@ -241,7 +241,7 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
     public boolean onMarkerClick(Marker marker) {
 
         if (mPreviousMarker != null) {
-            Feature feature = mMarkers.get(marker);
+            Feature feature = mMarkers.get(mPreviousMarker);
             mPreviousMarker.setIcon(BitmapDescriptorFactory.fromResource(getColoredIcon(getAvailabilityPercentage(feature))));
         }
         mSelectedMarker = marker;
