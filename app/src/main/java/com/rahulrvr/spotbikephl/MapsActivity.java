@@ -51,10 +51,10 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
         GoogleApiClient.ConnectionCallbacks, LocationListener, GoogleApiClient.OnConnectionFailedListener {
 
     private static final int DEFAULT_ZOOM = 15;
-    private static final int DEFAULT_ZOOM_SHOW_ALL = 12;
     private static final float DEFAULT_MILE = 1.0f; //miles
     private static final int REFRESH_TIME = 60000;
     private static final float MAX_DIST = 4.0f;
+    private static final int DIST_CHECK = 10;
 
     @InjectView(R.id.txtAddress)
     TextView txtAddress;
@@ -410,7 +410,7 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
         float distance = location.distanceTo(location1);
         double distInMiles = distance / 1609.34;
 
-        if (distInMiles > 10) {
+        if (distInMiles > DIST_CHECK) {
             mCurrentLocation = location;
         } else {
             mCurrentLocation = location;

@@ -52,13 +52,11 @@ android {
             applicationIdSuffix ".debug"
             debuggable true
             buildConfigField STRING, BASE_END_POINT, DEV_END_POINT
-            minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             buildConfigField STRING, BASE_END_POINT, PROD_END_POINT
         }
 
         release {
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             buildConfigField STRING, BASE_END_POINT, PROD_END_POINT
             signingConfig signingConfigs.releaseTest
