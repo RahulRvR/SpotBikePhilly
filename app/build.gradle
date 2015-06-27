@@ -22,9 +22,16 @@ def versionPatch = 0
 def versionBuild = 0
 
 android {
+    signingConfigs {
+        releaseTest {
+            keyAlias 'releaseTest'
+            keyPassword 'releaseTest'
+            storeFile file('/Users/vijayr/Documents/AndroidTestProjects/SpotBikePhilly/keystore/releaseTest.keystore')
+            storePassword 'releaseTest'
+        }
+    }
     compileSdkVersion 22
     buildToolsVersion "22.0.1"
-
     defaultConfig {
         applicationId "com.rahulrvr.spotbikephl"
         minSdkVersion 16
@@ -36,7 +43,7 @@ android {
         def STRING = "String"
         def BASE_END_POINT = "BASE_SERVER_ENDPOINT"
 
-        def DEV_END_POINT= "\"https://api.phila.gov\""
+        def DEV_END_POINT = "\"https://api.phila.gov\""
         def PROD_END_POINT = "\"https://api.phila.gov\""
 
 
@@ -44,24 +51,25 @@ android {
         debug {
             applicationIdSuffix ".debug"
             debuggable true
-            buildConfigField STRING,BASE_END_POINT,DEV_END_POINT
+            buildConfigField STRING, BASE_END_POINT, DEV_END_POINT
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            buildConfigField STRING, BASE_END_POINT, PROD_END_POINT
         }
 
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            buildConfigField STRING,BASE_END_POINT,PROD_END_POINT
+            buildConfigField STRING, BASE_END_POINT, PROD_END_POINT
+            signingConfig signingConfigs.releaseTest
         }
     }
-
     lintOptions {
         disable 'InvalidPackage'
     }
-
     packagingOptions {
         exclude 'META-INF/services/javax.annotation.processing.Processor'
     }
-
 }
 
 dependencies {
