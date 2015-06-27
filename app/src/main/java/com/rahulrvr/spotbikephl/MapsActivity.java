@@ -1,7 +1,9 @@
 package com.rahulrvr.spotbikephl;
 
+import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -51,7 +53,7 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
         GoogleApiClient.ConnectionCallbacks, LocationListener, GoogleApiClient.OnConnectionFailedListener {
 
     private static final int DEFAULT_ZOOM = 15;
-    private static final float DEFAULT_MILE = 1.0f; //miles
+    private static final float DEFAULT_MILE = 2.0f; //miles
     private static final int REFRESH_TIME = 60000;
     private static final float MAX_DIST = 4.0f;
     private static final int DIST_CHECK = 10;
@@ -210,6 +212,12 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
                         .customView(view, true)
                         .positiveText(R.string.action_ok)
                         .show();
+                return true;
+            case R.id.menu_contact_us :
+                String uri = "tel:" +  getString(R.string.customer_care_number);
+                Intent intent = new Intent(Intent.ACTION_CALL);
+                intent.setData(Uri.parse(uri));
+                startActivity(intent);
                 return true;
         }
         return false;
