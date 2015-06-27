@@ -87,7 +87,7 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
     float mCurrentDistance = -1;
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
 
-
+    MaterialDialog.Builder mBuilder;
     GoogleApiClient mGoogleApiClient;
 
 
@@ -126,7 +126,6 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
         });
 
 
-
         Timer timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
@@ -151,6 +150,25 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
         buildGoogleApiClient();
         setUpMapIfNeeded();
         hidePanel();
+        initialize();
+
+        mBuilder = new MaterialDialog.Builder(this)
+                .positiveColorRes(R.color.primary).positiveText(R.string.action_ok);
+    }
+
+
+    private void initialize() {
+        mBuilder = new MaterialDialog.Builder(this)
+                .positiveColorRes(R.color.primary).positiveText(R.string.action_ok);
+        getSupportActionBar().setDisplayShowCustomEnabled(true);
+        getSupportActionBar().setCustomView(R.layout.layout_actionbar);
+        TextView appName = (TextView) getSupportActionBar().getCustomView().findViewById(R.id.appName);
+
+
+        appName.setTypeface(
+                ManagerTypeface.getTypeface(this, R.string.typeface_roboto_light));
+
+
     }
 
     protected synchronized void buildGoogleApiClient() {
@@ -271,18 +289,18 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
 
 
     private void showInfoScreen(boolean flag) {
-       //TODO
+        //TODO
     }
 
 
     @Override
     public void onBackPressed() {
 
-       if(slidingLayout.getPanelState().equals(SlidingUpPanelLayout.PanelState.HIDDEN)) {
-           super.onBackPressed();
-       } else {
-          hidePanel();
-       }
+        if (slidingLayout.getPanelState().equals(SlidingUpPanelLayout.PanelState.HIDDEN)) {
+            super.onBackPressed();
+        } else {
+            hidePanel();
+        }
     }
 
     @Override
@@ -353,15 +371,11 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
 
 
     private void showErrorMessage(int title, int message) {
-        new MaterialDialog.Builder(this)
-                .positiveColorRes(R.color.primary)
-                .title(title)
-                .content(message)
-                .positiveText(R.string.action_ok)
-                .show();
-
+        if (mBuilder != null) {
+            mBuilder.title(title)
+                    .content(message).show();
+        }
         progressBar.setVisibility(View.GONE);
-
     }
 
 
@@ -376,7 +390,7 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
         float distance = mCurrentLocation.distanceTo(location);
         double distInMiles = distance / 1609.34;
 
-        if(distInMiles>10) {
+        if (distInMiles > 10) {
             mCurrentLocation = location;
         }
         setMapZoom(0);
@@ -396,7 +410,7 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
         float distance = location.distanceTo(location1);
         double distInMiles = distance / 1609.34;
 
-        if(distInMiles>10) {
+        if (distInMiles > 10) {
             mCurrentLocation = location;
         } else {
             mCurrentLocation = location;
