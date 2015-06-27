@@ -56,9 +56,6 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
     private static final int REFRESH_TIME = 60000;
     private static final float MAX_DIST = 4.0f;
 
-    private static final int PANEL_HEIGHT = 150;
-    private static final int PANEL_HEIGHT_ZERO = 0;
-
     @InjectView(R.id.txtAddress)
     TextView txtAddress;
     @InjectView(R.id.txtFreeDocks)
@@ -75,6 +72,7 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
     BikeIndicator bikeIndicator;
 
     private Observable<Feature> mLocationObservable;
+
 
     GetLocationPresenter mPresenter;
     Location mCurrentLocation;
@@ -347,11 +345,7 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
         if (mCurrentLocation != null) {
             final LatLng mCurrentPos = new LatLng(mCurrentLocation.getLatitude(),
                     mCurrentLocation.getLongitude());
-            if (mShowAll) {
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mCurrentPos, DEFAULT_ZOOM_SHOW_ALL));
-            } else {
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mCurrentPos, DEFAULT_ZOOM - zoomBy));
-            }
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mCurrentPos, DEFAULT_ZOOM));
         } else {
             showErrorMessage(R.string.error_title, R.string.location_not_found);
         }
@@ -375,6 +369,16 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
     public void onConnected(Bundle bundle) {
         mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(
                 mGoogleApiClient);
+
+        Location location = new Location("philly");
+        location.setLongitude(-75.1652);
+        location.setLatitude(39.9526);
+        float distance = mCurrentLocation.distanceTo(location);
+        double distInMiles = distance / 1609.34;
+
+        if(distInMiles>10) {
+            mCurrentLocation = location;
+        }
         setMapZoom(0);
     }
 
@@ -385,7 +389,18 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
 
     @Override
     public void onLocationChanged(Location location) {
-        mCurrentLocation = location;
+
+        Location location1 = new Location("philly");
+        location.setLongitude(-75.1652);
+        location.setLatitude(39.9526);
+        float distance = location.distanceTo(location1);
+        double distInMiles = distance / 1609.34;
+
+        if(distInMiles>10) {
+            mCurrentLocation = location;
+        } else {
+            mCurrentLocation = location;
+        }
         setLocationsOnMap();
     }
 
