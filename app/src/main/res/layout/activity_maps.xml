@@ -5,7 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="bottom"
-    sothree:umanoOverlay="true"
     sothree:umanoPanelHeight="150dp"
     sothree:umanoShadowHeight="4dp">
 
@@ -45,30 +44,6 @@
             android:layout_height="wrap_content"
             />
 
-        <com.appyvet.rangebar.RangeBar xmlns:custom="http://schemas.android.com/apk/res-auto"
-            android:id="@+id/searchDistance"
-            android:layout_width="match_parent"
-            android:layout_height="72dp"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentTop="true"
-            custom:barColor="@color/icons"
-            custom:connectingLineColor="@color/icons"
-            custom:pinColor="@color/icons"
-            custom:rangeBar="false"
-            custom:selectorColor="@color/icons"
-            custom:textColor="@color/primary"
-            custom:tickColor="@color/icons"
-            custom:tickEnd="4.0"
-            custom:tickInterval="0.2"
-            custom:tickStart="0.0" />
-
-        <TextView
-            android:id="@+id/searchDistanceLabel"
-            android:layout_below="@id/searchDistance"
-            android:text="@string/label_serach_distance"
-            android:textColor="@color/icons"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
 
     </RelativeLayout>
 

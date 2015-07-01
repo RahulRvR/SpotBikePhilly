@@ -8,13 +8,11 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.appyvet.rangebar.RangeBar;
 import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -56,7 +54,7 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
     private static final float DEFAULT_MILE = 2.0f; //miles
     private static final int REFRESH_TIME = 60000;
     private static final float MAX_DIST = 4.0f;
-    private static final int DIST_CHECK = 10;
+    private static final int DIST_CHECK = 6;
 
     @InjectView(R.id.txtAddress)
     TextView txtAddress;
@@ -64,8 +62,6 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
     TextView txtFreeDocks;
     @InjectView(R.id.txtBikeAvl)
     TextView txtBikeAvl;
-    @InjectView(R.id.searchDistance)
-    RangeBar searchDistance;
     @InjectView(R.id.progressBar)
     ProgressBar progressBar;
     @InjectView(R.id.sliding_layout)
@@ -102,31 +98,6 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
         setContentView(R.layout.activity_maps);
         ButterKnife.inject(this);
         mPresenter = new GetLocationPresenterImpl(this);
-        searchDistance.setRangePinsByIndices(0, 0);
-        searchDistance.setEnabled(false);
-        searchDistance.setOnRangeBarChangeListener(new RangeBar.OnRangeBarChangeListener() {
-
-
-            @Override
-            public void onRangeChangeListener(RangeBar rangeBar, int i, int i1, String s, final String s1) {
-
-                rangeBar.setOnTouchListener(new View.OnTouchListener() {
-                    @Override
-                    public boolean onTouch(View v, MotionEvent event) {
-                        if (event.getAction() == MotionEvent.ACTION_UP) {
-                            mCurrentDistance = Float.parseFloat(s1);
-                            mShowAll = false;
-                            setLocationsOnMap();
-                        }
-                        return false;
-                    }
-                });
-
-            }
-
-
-        });
-
 
         Timer timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
@@ -314,13 +285,7 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
     @Override
     public void onLocationsReceived(List<Feature> locations) {
         mLocationObservable = Observable.from(locations);
-        //runs first time
-        if (updateUI) {
-            searchDistance.setEnabled(true);
-            searchDistance.setSeekPinByValue(DEFAULT_MILE);
-            setLocationsOnMap();
-            updateUI = false;
-        }
+        setLocationsOnMap();
     }
 
     @Override
@@ -355,19 +320,7 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
 
     }
 
-    private void updateSearchText(float dist) {
-        String str = null;
-        if (mShowAll) {
-            str = String.format(getString(R.string.search_text), mMarkers.size(), MAX_DIST);
-        } else {
-            str = String.format(getString(R.string.search_text), mMarkers.size(), dist);
-        }
-//        txtTotalDocks.setVisibility(View.VISIBLE);
-//        txtTotalDocks.setText(str);
-
-    }
-
-    private void setMapZoom(int zoomBy) {
+    private void setMapZoom() {
         if (mCurrentLocation != null) {
             final LatLng mCurrentPos = new LatLng(mCurrentLocation.getLatitude(),
                     mCurrentLocation.getLongitude());
@@ -387,21 +340,29 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
     }
 
 
+    private void updateLocation(Location location) {
+
+        if(location!= null) {
+            Location philly = new Location("philly");
+            philly.setLongitude(-75.1652);
+            philly.setLatitude(39.9526);
+            float distance = location.distanceTo(philly);
+            double distInMiles = distance / 1609.34;
+
+            if (distInMiles > DIST_CHECK) {
+                mCurrentLocation = philly;
+            }
+            setMapZoom();
+        } else {
+            showErrorMessage(R.string.error_title,R.string.location_not_found);
+        }
+    }
+
+
     @Override
     public void onConnected(Bundle bundle) {
-        mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(
-                mGoogleApiClient);
-
-        Location location = new Location("philly");
-        location.setLongitude(-75.1652);
-        location.setLatitude(39.9526);
-        float distance = mCurrentLocation.distanceTo(location);
-        double distInMiles = distance / 1609.34;
-
-        if (distInMiles > 10) {
-            mCurrentLocation = location;
-        }
-        setMapZoom(0);
+        updateLocation(LocationServices.FusedLocationApi.getLastLocation(
+                mGoogleApiClient));
     }
 
     @Override
@@ -411,19 +372,7 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
 
     @Override
     public void onLocationChanged(Location location) {
-
-        Location location1 = new Location("philly");
-        location.setLongitude(-75.1652);
-        location.setLatitude(39.9526);
-        float distance = location.distanceTo(location1);
-        double distInMiles = distance / 1609.34;
-
-        if (distInMiles > DIST_CHECK) {
-            mCurrentLocation = location;
-        } else {
-            mCurrentLocation = location;
-        }
-        setLocationsOnMap();
+        updateLocation(location);
     }
 
     @Override
@@ -471,8 +420,7 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
                 if (mMarkers.size() <= 0) {
                     showErrorMessage(R.string.title_no_docks, R.string.no_docks_message);
                 }
-                updateSearchText(mCurrentDistance);
-                setMapZoom((int) mCurrentDistance);
+                setMapZoom();
             }
 
             @Override
