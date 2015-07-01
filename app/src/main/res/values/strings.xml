@@ -30,8 +30,6 @@
     <string name="typeface_roboto_thin">RobotoSlab-Thin</string>
     <string name="typeface_roboto_bold">RobotoSlab-Bold</string>
 
-    <string name="range_bar">Custom Range Bar Slider</string>
-    <string name="range_bar_url">https://github.com/edmodo/range-bar</string>
 
     <string name="icons">Icons</string>
     <string name="icons_attr"><div>Icons made by <a href="http://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="http://www.flaticon.com" title="Flaticon">www.flaticon.com</a>             is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0">CC BY 3.0</a></div></string>
@@ -46,8 +44,6 @@
     <string name="bike_data">Bike API- Open Data Philly</string>
     <string name="bike_data_url">https://www.opendataphilly.org/dataset/bike-share-stations</string>
 
-    <string name="roboto_text_view">Roboto Text View</string>
-    <string name="roboto_text_view_url">https://github.com/johnkil/Android-RobotoTextView"</string>
 
     <string name="version">Version</string>
     <string name="label_bikes">Bikes</string>

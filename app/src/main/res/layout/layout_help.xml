@@ -18,20 +18,6 @@
         android:layout_height="wrap_content" />
 
 
-
-    <TextView
-        android:text="@string/range_bar"
-        style="@style/aboutHeader"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <TextView
-        android:text="@string/range_bar_url"
-        android:autoLink="web"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-
     <TextView
         style="@style/aboutHeader"
         android:text="@string/material_dialogs"

@@ -351,6 +351,8 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
 
             if (distInMiles > DIST_CHECK) {
                 mCurrentLocation = philly;
+            } else {
+                mCurrentLocation = location;
             }
             setMapZoom();
         } else {
