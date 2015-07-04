@@ -45,15 +45,12 @@ import retrofit.RetrofitError;
 import rx.Observable;
 import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
 
 public class MapsActivity extends AppCompatActivity implements GetLocationView, GoogleMap.OnMarkerClickListener,
         GoogleApiClient.ConnectionCallbacks, LocationListener, GoogleApiClient.OnConnectionFailedListener {
 
     private static final int DEFAULT_ZOOM = 15;
-    private static final float DEFAULT_MILE = 2.0f; //miles
     private static final int REFRESH_TIME = 60000;
-    private static final float MAX_DIST = 4.0f;
     private static final int DIST_CHECK = 6;
 
     @InjectView(R.id.txtAddress)
@@ -76,15 +73,9 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
     Location mCurrentLocation;
     Marker mPreviousMarker = null;
     Marker mSelectedMarker = null;
-    boolean updateUI = true;
-
     LatLng mSelectedCoOrdinates;
-    boolean mShowAll = false;
     HashMap<Marker, Feature> mMarkers = new HashMap<Marker, Feature>();
-
-    float mCurrentDistance = -1;
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
-
     MaterialDialog.Builder mBuilder;
     GoogleApiClient mGoogleApiClient;
 
@@ -136,12 +127,8 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
         getSupportActionBar().setDisplayShowCustomEnabled(true);
         getSupportActionBar().setCustomView(R.layout.layout_actionbar);
         TextView appName = (TextView) getSupportActionBar().getCustomView().findViewById(R.id.appName);
-
-
         appName.setTypeface(
                 ManagerTypeface.getTypeface(this, R.string.typeface_roboto_light));
-
-
     }
 
     protected synchronized void buildGoogleApiClient() {
@@ -184,11 +171,30 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
                         .positiveText(R.string.action_ok)
                         .show();
                 return true;
-            case R.id.menu_contact_us :
-                String uri = "tel:" +  getString(R.string.customer_care_number);
-                Intent intent = new Intent(Intent.ACTION_CALL);
-                intent.setData(Uri.parse(uri));
-                startActivity(intent);
+            case R.id.menu_contact_us:
+                new MaterialDialog.Builder(this).callback(new MaterialDialog.ButtonCallback() {
+                    @Override
+                    public void onPositive(MaterialDialog dialog) {
+                        String uri = "tel:" + getString(R.string.customer_care_number);
+                        Intent intent = new Intent(Intent.ACTION_CALL);
+                        intent.setData(Uri.parse(uri));
+                        startActivity(intent);
+                    }
+
+                    @Override
+                    public void onNegative(MaterialDialog dialog) {
+                        dialog.dismiss();
+                    }
+                })
+                        .positiveColorRes(R.color.primary)
+                        .negativeColorRes(R.color.secondary_text)
+                        .title(R.string.contact_customer_care_title)
+                        .content(R.string.contact_customer_care_msg)
+                        .positiveText(R.string.label_yes)
+                        .negativeText(R.string.label_no)
+                        .show();
+
+
                 return true;
         }
         return false;
@@ -333,6 +339,7 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
 
     private void showErrorMessage(int title, int message) {
         if (mBuilder != null) {
+            mBuilder.autoDismiss(true);
             mBuilder.title(title)
                     .content(message).show();
         }
@@ -342,7 +349,7 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
 
     private void updateLocation(Location location) {
 
-        if(location!= null) {
+        if (location != null) {
             Location philly = new Location("philly");
             philly.setLongitude(-75.1652);
             philly.setLatitude(39.9526);
@@ -355,8 +362,6 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
                 mCurrentLocation = location;
             }
             setMapZoom();
-        } else {
-            showErrorMessage(R.string.error_title,R.string.location_not_found);
         }
     }
 
@@ -399,29 +404,25 @@ public class MapsActivity extends AppCompatActivity implements GetLocationView, 
 
     private void setLocationsOnMap() {
         clearMarkers();
-        if (mCurrentDistance < 0) {
-            mCurrentDistance = DEFAULT_MILE;
-        }
-        mLocationObservable.filter(new Func1<Feature, Boolean>() {
-            @Override
-            public Boolean call(Feature feature) {
-                Geometry geometry = feature.getGeometry();
-                Double longitude = geometry.getCoordinates().get(0);
-                Double latitude = geometry.getCoordinates().get(1);
+//        mLocationObservable.filter(new Func1<Feature, Boolean>() {
+//            @Override
+//            public Boolean call(Feature feature) {
+//                Geometry geometry = feature.getGeometry();
+//                Double longitude = geometry.getCoordinates().get(0);
+//                Double latitude = geometry.getCoordinates().get(1);
+//
+//                Location location = new Location("loc");
+//                location.setLongitude(longitude);
+//                location.setLatitude(latitude);
+//                float distance = mCurrentLocation.distanceTo(location);
+//                double distInMiles = distance / 1609.34;
+//                return ;
+//            }
+//        })
 
-                Location location = new Location("loc");
-                location.setLongitude(longitude);
-                location.setLatitude(latitude);
-                float distance = mCurrentLocation.distanceTo(location);
-                double distInMiles = distance / 1609.34;
-                return distInMiles <= mCurrentDistance || mShowAll;
-            }
-        }).observeOn(AndroidSchedulers.mainThread()).subscribe(new Observer<Feature>() {
+        mLocationObservable.observeOn(AndroidSchedulers.mainThread()).subscribe(new Observer<Feature>() {
             @Override
             public void onCompleted() {
-                if (mMarkers.size() <= 0) {
-                    showErrorMessage(R.string.title_no_docks, R.string.no_docks_message);
-                }
                 setMapZoom();
             }
 

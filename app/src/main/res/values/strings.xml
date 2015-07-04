@@ -18,7 +18,11 @@
 
     <string name="title_no_docks">No Docks</string>
 
-    <string name="no_docks_message">No Docks available in the selected distance.</string>
+    <string name="contact_customer_care_title">Contact customer care</string>
+    <string name="contact_customer_care_msg">Would you like to contact the customer care ?</string>
+    <string name="label_yes">Yes</string>
+    <string name="label_no">No</string>
+
 
     <string name="location_not_found">Could not detect current location, Please try again later.</string>
 
