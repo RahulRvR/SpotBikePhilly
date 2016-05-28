@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.Toolbar
+    android:id="@+id/toolbar"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:paddingTop="20dp"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:background="?attr/colorPrimary"
+    >
+
+    <com.appyvet.rangebar.RangeBar
+        xmlns:custom="http://schemas.android.com/apk/res-auto"
+        custom:barColor="@color/icons"
+        custom:pinColor="@color/icons"
+        custom:textColor="@color/primary"
+        custom:tickColor="@color/icons"
+        custom:tickInterval="0.2"
+        custom:tickStart="0.0"
+        custom:tickEnd="4.0"
+        custom:selectorColor="@color/icons"
+        custom:connectingLineColor="@color/icons"
+        android:id="@+id/searchDistance"
+        android:layout_width="match_parent"
+        custom:rangeBar="false"
+        android:layout_height="72dp"
+        android:layout_alignParentTop="true" />
+
+</android.support.v7.widget.Toolbar>

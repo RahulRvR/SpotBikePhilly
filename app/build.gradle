@@ -1,31 +1,88 @@
+buildscript {
+    repositories {
+        maven { url 'https://maven.fabric.io/public' }
+    }
+
+    dependencies {
+        classpath 'io.fabric.tools:gradle:1.+'
+    }
+}
 apply plugin: 'com.android.application'
+apply plugin: 'io.fabric'
+
+repositories {
+    maven { url 'https://maven.fabric.io/public' }
+}
+
+// Manifest version information
+def versionMajor = 1
+def versionMinor = 3
+def versionPatch = 0
+// bump for dogfood builds, public betas, etc.
+def versionBuild = 0
 
 android {
+    signingConfigs {
+        releaseTest {
+            keyAlias 'releaseTest'
+            keyPassword 'releaseTest'
+            storeFile file('/Users/vijayr/Documents/AndroidTestProjects/SpotBikePhilly/keystore/releaseTest.keystore')
+            storePassword 'releaseTest'
+        }
+    }
     compileSdkVersion 22
     buildToolsVersion "22.0.1"
-
     defaultConfig {
-        applicationId "com.rahulrvr.spotbikephilly"
+        applicationId "com.rahulrvr.spotbikephl"
         minSdkVersion 16
         targetSdkVersion 22
-        versionCode 1
-        versionName "1.0"
+        versionCode versionMajor * 10000 + versionMinor * 1000 + versionPatch * 100 + versionBuild
+        versionName "${versionMajor}.${versionMinor}.${versionPatch}"
     }
     buildTypes {
+        def STRING = "String"
+        def BASE_END_POINT = "BASE_SERVER_ENDPOINT"
+
+        def DEV_END_POINT = "\"https://api.phila.gov\""
+        def PROD_END_POINT = "\"https://api.phila.gov\""
+
+
+
+        debug {
+            applicationIdSuffix ".debug"
+            debuggable true
+            buildConfigField STRING, BASE_END_POINT, DEV_END_POINT
+            buildConfigField STRING, BASE_END_POINT, PROD_END_POINT
+        }
+
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            buildConfigField STRING, BASE_END_POINT, PROD_END_POINT
+            signingConfig signingConfigs.releaseTest
         }
+    }
+    lintOptions {
+        disable 'InvalidPackage'
+    }
+    packagingOptions {
+        exclude 'META-INF/services/javax.annotation.processing.Processor'
     }
 }
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:22.2.0'
+    compile 'com.android.support:design:22.2.0'
     compile 'com.google.android.gms:play-services:7.5.0'
     compile 'com.squareup.retrofit:retrofit:1.9.0'
+    compile 'com.jakewharton:butterknife:6.1.0'
     compile 'io.reactivex:rxjava:1.0.10'
     compile 'io.reactivex:rxandroid:0.24.0'
+    compile 'com.appyvet:materialrangebar:1.0'
+    compile 'com.afollestad:material-dialogs:0.7.6.0'
     compile 'com.sothree.slidinguppanel:library:3.0.0'
-    compile 'com.github.johnkil.android-robototextview:robototextview:2.4.0'
+    compile('com.crashlytics.sdk.android:crashlytics:2.3.2@aar') {
+        transitive = true;
+    }
 }

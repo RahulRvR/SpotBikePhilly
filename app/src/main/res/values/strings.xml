@@ -1,4 +1,59 @@
 <resources>
-    <string name="app_name">SpotBikePhilly</string>
+    <string name="app_name">SpotBike Philly</string>
     <string name="title_activity_maps">Map</string>
+
+    <string name="search_text">%1$d Dock(s) within %2$.2f mi.</string>
+
+    <string name="free_docks">Free Docks : %1$d</string>
+
+    <string name="bikes">Bikes : %1$d</string>
+
+    <string name="error_title">Error</string>
+
+    <string name="about_title">About</string>
+
+    <string name="about">About</string>
+
+    <string name="no_connectivity_message">A Valid network connection is required. Please try again later.</string>
+
+    <string name="title_no_docks">No Docks</string>
+
+    <string name="contact_customer_care_title">Contact customer care</string>
+    <string name="contact_customer_care_msg">Would you like to contact the customer care ?</string>
+    <string name="label_yes">Yes</string>
+    <string name="label_no">No</string>
+
+
+    <string name="location_not_found">Could not detect current location, Please try again later.</string>
+
+    <string name="action_ok">OK</string>
+
+    <!-- Typeface names -->
+    <string name="typeface_roboto_regular">RobotoSlab-Regular</string>
+    <string name="typeface_roboto_light">RobotoSlab-Light</string>
+    <string name="typeface_roboto_thin">RobotoSlab-Thin</string>
+    <string name="typeface_roboto_bold">RobotoSlab-Bold</string>
+
+
+    <string name="icons">Icons</string>
+    <string name="icons_attr"><div>Icons made by <a href="http://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="http://www.flaticon.com" title="Flaticon">www.flaticon.com</a>             is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0">CC BY 3.0</a></div></string>
+    <string name="icons_attr2"> https://romannurik.github.io/AndroidAssetStudio/</string>
+
+    <string name="material_dialogs">Material Dialogs</string>
+    <string name="material_dialogs_url">https://github.com/afollestad/material-dialogs</string>
+
+    <string name="sliding_layout">AndroidSlidingUpPanel</string>
+    <string name="sliding_layout_url">https://github.com/umano/AndroidSlidingUpPanel</string>
+
+    <string name="bike_data">Bike API- Open Data Philly</string>
+    <string name="bike_data_url">https://www.opendataphilly.org/dataset/bike-share-stations</string>
+
+
+    <string name="version">Version</string>
+    <string name="label_bikes">Bikes</string>
+    <string name="label_free_docks">Free Docks</string>
+    <string name="label_serach_distance">Search Radius</string>
+    <string name="contact_us">Contact Us</string>
+    <string name="customer_care_number">844\-446\-3346</string>
+    gs
 </resources>
