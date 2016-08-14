@@ -30,12 +30,12 @@ android {
             storePassword 'releaseTest'
         }
     }
-    compileSdkVersion 22
+    compileSdkVersion 24
     buildToolsVersion "22.0.1"
     defaultConfig {
         applicationId "com.rahulrvr.spotbikephl"
         minSdkVersion 16
-        targetSdkVersion 22
+        targetSdkVersion 23
         versionCode versionMajor * 10000 + versionMinor * 1000 + versionPatch * 100 + versionBuild
         versionName "${versionMajor}.${versionMinor}.${versionPatch}"
     }
@@ -72,15 +72,15 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:22.2.0'
-    compile 'com.android.support:design:22.2.0'
+    compile 'com.android.support:appcompat-v7:24.1.1'
+    compile 'com.android.support:design:24.1.1'
     compile 'com.google.android.gms:play-services:7.5.0'
     compile 'com.squareup.retrofit:retrofit:1.9.0'
     compile 'com.jakewharton:butterknife:6.1.0'
     compile 'io.reactivex:rxjava:1.0.10'
     compile 'io.reactivex:rxandroid:0.24.0'
     compile 'com.appyvet:materialrangebar:1.0'
-    compile 'com.afollestad:material-dialogs:0.7.6.0'
+    compile 'com.afollestad.material-dialogs:core:0.9.0.1'
     compile 'com.sothree.slidinguppanel:library:3.0.0'
     compile('com.crashlytics.sdk.android:crashlytics:2.3.2@aar') {
         transitive = true;
